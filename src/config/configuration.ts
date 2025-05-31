@@ -34,5 +34,11 @@ export default registerAs('config', (): Configuration => {
     redis: {
       url: process.env.REDIS_URL!,
     },
+    email: {
+      strategy:
+        (process.env.EMAIL_STRATEGY as 'console' | 'resend') || 'console',
+      resendApiKey: process.env.RESEND_API_KEY,
+      fromEmail: process.env.FROM_EMAIL,
+    },
   };
 });

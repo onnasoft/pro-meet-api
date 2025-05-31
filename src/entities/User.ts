@@ -21,6 +21,21 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ default: false })
+  isEmailVerified: boolean;
+
+  @Column({ nullable: true, type: 'varchar' })
+  verificationToken: string | null;
+
+  @Column({ nullable: true, type: 'timestamp' })
+  verificationTokenExpiresAt: Date | null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  passwordResetToken: string | null;
+
+  @Column({ nullable: true, type: 'timestamp' })
+  passwordResetTokenExpiresAt: Date | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

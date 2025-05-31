@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@/entities/User';
 import { FindOneOptions, Repository, IsNull } from 'typeorm';
@@ -12,9 +11,9 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
+  create(payload: CreateUserDto) {
     return this.userRepository.save({
-      ...createUserDto,
+      ...payload,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -35,8 +34,8 @@ export class UsersService {
     return this.userRepository.findOne(options);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    await this.userRepository.update(id, updateUserDto);
+  async update(id: string, payload: Partial<User>) {
+    await this.userRepository.update(id, payload);
     return this.findOne({ where: { id } });
   }
 

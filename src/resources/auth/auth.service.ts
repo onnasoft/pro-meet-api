@@ -10,12 +10,14 @@ import {
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { comparePassword, hashPassword } from '@/utils/secure';
 import { UsersService } from '@/resources/users/users.service';
+import { EmailService } from '@/services/email/email.service';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
+    private readonly emailService: EmailService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
@@ -36,7 +38,22 @@ export class AuthService {
         password: hashedPassword,
       });
 
-      return this.login(newUser);
+      const passwordResetToken = Math.random().toString(36).substring(2, 15);
+      this.usersService.update(newUser.id, {
+        verificationToken: passwordResetToken,
+        verificationTokenExpiresAt: new Date(Date.now() + 3600000 * 24),
+      });
+
+      await this.emailService.sendVerificationEmail(
+        newUser.email,
+        newUser.name,
+        passwordResetToken,
+      );
+
+      return {
+        message:
+          'Registration successful. Please check your email to verify your account.',
+      };
     } catch (error) {
       this.logger.error(
         `Error during registration: ${error.message}`,
@@ -63,6 +80,17 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
+
+      const passwordResetToken = Math.random().toString(36).substring(2, 15);
+      this.usersService.update(user.id, {
+        passwordResetToken: passwordResetToken,
+        passwordResetTokenExpiresAt: new Date(Date.now() + 3600000),
+      });
+
+      await this.emailService.sendPasswordResetEmail(
+        user.email,
+        passwordResetToken,
+      );
 
       // Here you would typically send a reset password email
       // For simplicity, we just return the user data

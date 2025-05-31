@@ -25,4 +25,9 @@ export interface Configuration {
   database: DatabaseConfiguration;
   redis: RedisConfiguration;
   baseUrl: string;
+  email: {
+    strategy: 'console' | 'resend';
+    resendApiKey?: string;
+    fromEmail?: string;
+  };
 }

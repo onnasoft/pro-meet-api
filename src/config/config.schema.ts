@@ -31,6 +31,31 @@ class EnvironmentVariables {
   })
   SECRET_KEY: string;
 
+  @IsString()
+  @IsNotEmpty({ message: 'BASE_URL is required' })
+  @Matches(/^(https?:\/\/)?([\w.-]+)(:\d+)?(\/[\w.-]*)*\/?$/, {
+    message: 'BASE_URL must be a valid URL',
+  })
+  BASE_URL: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'RESEND_API_KEY is required' })
+  @MinLength(32, {
+    message: 'RESEND_API_KEY must be at least 32 characters long',
+  })
+  RESEND_API_KEY: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'FROM_EMAIL is required' })
+  FROM_EMAIL: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'EMAIL_STRATEGY is required' })
+  @IsIn(['console', 'resend'], {
+    message: 'EMAIL_STRATEGY must be either console or resend',
+  })
+  EMAIL_STRATEGY: string;
+
   // Database Configuration
   @IsString()
   @IsNotEmpty({ message: 'DB_DRIVER is required' })
