@@ -18,19 +18,12 @@ import {
 import { ValidationPipe } from '@/pipes/validation.pipe';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@/entities/User';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { ForgotPasswordAuthDto } from './dto/forgot-password-auth.dto';
 
-class RegisterResponseDto {
+class LoginResponseDto {
   @ApiResponseProperty()
-  id: number;
-
-  @ApiResponseProperty()
-  email: string;
-
-  @ApiResponseProperty()
-  name: string;
-
-  @ApiResponseProperty()
-  createdAt: Date;
+  access_token: string;
 }
 
 @ApiTags('Authentication')
@@ -43,7 +36,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'User successfully registered',
-    type: RegisterResponseDto,
+    type: LoginResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
@@ -59,8 +52,38 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard('local'))
+  @ApiOperation({ summary: 'User login' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User successfully logged in',
+    type: LoginResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Invalid credentials',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Validation error',
+  })
+  @ApiBody({ type: LoginAuthDto })
   @Post('/login')
   login(@Request() req: Express.Request & { user: User }) {
     return this.authService.login(req.user);
+  }
+
+  @Post('/forgot-password')
+  @ApiOperation({ summary: 'Request password reset' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password reset link sent to email',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Validation error',
+  })
+  @ApiBody({ type: ForgotPasswordAuthDto })
+  async forgotPassword(@Body('email') email: string) {
+    return this.authService.forgotPassword(email);
   }
 }

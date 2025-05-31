@@ -1,3 +1,5 @@
+import { JwtService } from '@nestjs/jwt';
+import { User } from '@/entities/User';
 import {
   ConflictException,
   Injectable,
@@ -6,10 +8,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterAuthDto } from './dto/register-auth.dto';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
-import { User } from '@/entities/User';
 import { comparePassword, hashPassword } from '@/utils/secure';
+import { UsersService } from '@/resources/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -49,6 +49,39 @@ export class AuthService {
 
       throw new InternalServerErrorException(
         'Registration failed. Please try again later.',
+      );
+    }
+  }
+
+  async forgotPassword(email: string) {
+    try {
+      const user = await this.usersService.findOne({
+        where: { email },
+        select: ['id', 'email', 'name'],
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      // Here you would typically send a reset password email
+      // For simplicity, we just return the user data
+      return {
+        message: 'Password reset link sent to your email',
+        user,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error during forgot password for email ${email}: ${error.message}`,
+        error.stack,
+      );
+
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'Failed to process forgot password request. Please try again later.',
       );
     }
   }

@@ -15,9 +15,11 @@ import { Configuration } from './types/configuration';
 import * as fs from 'fs';
 import { User } from './entities/User';
 import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -56,6 +58,14 @@ const envFileExists = fs.existsSync(envPath);
       },
       inject: [NestConfigService],
       global: true,
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 100,
+        },
+      ],
     }),
     AuthModule,
     UsersModule,
