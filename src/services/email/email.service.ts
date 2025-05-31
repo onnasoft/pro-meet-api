@@ -2,10 +2,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { createEmailStrategy } from './email-strategy.factory';
 import { EmailStrategy } from './strategies/email-strategy.interface';
-import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { Configuration } from '@/types/configuration';
 import Handlebars from 'handlebars';
+import * as fs from 'fs';
 
 @Injectable()
 export class EmailService {
