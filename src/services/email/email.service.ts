@@ -67,6 +67,9 @@ export class EmailService {
     const html = template({
       reset_url: url,
     });
+
+    console.log('Sending password reset email to:', to);
+
     await this.strategy.send(to, 'Reset your password', html);
   }
 

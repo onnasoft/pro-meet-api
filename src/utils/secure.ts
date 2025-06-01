@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 
 const saltRounds = 10; // Coste del procesamiento (10-12 es buen balance entre seguridad y rendimiento)
 
@@ -13,4 +14,8 @@ export async function comparePassword(
 ): Promise<boolean> {
   const isMatch = await bcrypt.compare(password, hashedPassword);
   return isMatch;
+}
+
+export function generateRandomToken(): string {
+  return randomBytes(32).toString('hex');
 }
