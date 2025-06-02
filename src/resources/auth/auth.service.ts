@@ -15,12 +15,16 @@ import {
 } from '@/utils/secure';
 import { UsersService } from '@/resources/users/users.service';
 import { EmailService } from '@/services/email/email.service';
+import { GoogleIdTokenPayload } from '@/types/jwt';
+import { ConfigService } from '@nestjs/config';
+import { Configuration } from '@/types/configuration';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
+    private readonly configService: ConfigService,
     private readonly emailService: EmailService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -294,9 +298,43 @@ export class AuthService {
   }
 
   login(user: User) {
-    const payload = { username: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async loginWithGoogle(token: string) {
+    const config = this.configService.get('config') as Configuration;
+    if (
+      !(await this.jwtService.verifyAsync(token, {
+        secret: config.secret,
+      }))
+    ) {
+      throw new UnauthorizedException('Invalid Google token');
+    }
+    const decoded: GoogleIdTokenPayload = this.jwtService.decode(token);
+
+    if (!decoded || !decoded.email) {
+      throw new UnauthorizedException('Invalid Google token payload');
+    }
+
+    let user = await this.usersService.findOne({
+      where: { email: decoded.email },
+      select: ['id', 'email', 'name', 'isEmailVerified'],
+    });
+
+    if (!user) {
+      user = await this.usersService.create({
+        email: decoded.email,
+        name: decoded.name,
+        password: await hashPassword(generateRandomToken()),
+        isEmailVerified: true,
+      });
+    } else if (!user.isEmailVerified) {
+      throw new ConflictException('Email not verified');
+    }
+
+    return this.login(user);
   }
 }

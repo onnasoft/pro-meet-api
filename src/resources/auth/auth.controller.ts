@@ -5,6 +5,7 @@ import {
   HttpStatus,
   UseGuards,
   Request,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
@@ -75,6 +76,11 @@ export class AuthController {
   @Post('/login')
   login(@Request() req: Express.Request & { user: User }) {
     return this.authService.login(req.user);
+  }
+
+  @Post('/login/google')
+  loginWithGoogle(@Body('token') token: string) {
+    return this.authService.loginWithGoogle(token);
   }
 
   @Post('/forgot-password')
@@ -150,6 +156,33 @@ export class AuthController {
 
     return {
       message: 'Password successfully reset',
+      statusCode: HttpStatus.OK,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/me')
+  @ApiOperation({ summary: 'Get user session' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User session retrieved successfully',
+    type: User,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'User not authenticated',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Validation error',
+  })
+  @ApiResponseProperty({ type: User })
+  async me(@Request() req: Express.Request & { user: User }) {
+    console.log('User session:', req.user);
+    return {
+      user: req.user,
+      message: 'User session retrieved successfully',
       statusCode: HttpStatus.OK,
       timestamp: new Date().toISOString(),
     };

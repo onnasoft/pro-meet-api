@@ -11,9 +11,10 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  create(payload: CreateUserDto) {
+  create(payload: CreateUserDto & { isEmailVerified?: boolean }) {
     return this.userRepository.save({
       ...payload,
+      isEmailVerified: payload.isEmailVerified || false,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
