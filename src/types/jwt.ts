@@ -1,4 +1,4 @@
-export interface GoogleIdTokenPayload {
+export interface OauthIdTokenPayload {
   iss: 'https://accounts.google.com';
   azp: string;
   aud: string;

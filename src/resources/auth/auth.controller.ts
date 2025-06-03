@@ -78,9 +78,29 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @Post('/login/google')
-  loginWithGoogle(@Body('token') token: string) {
-    return this.authService.loginWithGoogle(token);
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'OAuth login' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User successfully logged in via OAuth',
+    type: LoginResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'User not authenticated',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Validation error',
+  })
+  @Get('/refresh')
+  refresh(@Request() req: Express.Request & { user: User }) {
+    return this.authService.refreshToken(req.user);
+  }
+
+  @Post('/oauth/login')
+  loginOAuth(@Body('token') token: string) {
+    return this.authService.loginOAuth(token);
   }
 
   @Post('/forgot-password')

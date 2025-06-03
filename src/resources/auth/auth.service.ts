@@ -15,7 +15,7 @@ import {
 } from '@/utils/secure';
 import { UsersService } from '@/resources/users/users.service';
 import { EmailService } from '@/services/email/email.service';
-import { GoogleIdTokenPayload } from '@/types/jwt';
+import { OauthIdTokenPayload } from '@/types/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Configuration } from '@/types/configuration';
 
@@ -47,7 +47,7 @@ export class AuthService {
       });
 
       const passwordResetToken = generateRandomToken();
-      this.usersService.update(newUser.id, {
+      await this.usersService.update(newUser.id, {
         verificationToken: passwordResetToken,
         verificationTokenExpiresAt: new Date(Date.now() + 3600000 * 24),
       });
@@ -90,7 +90,7 @@ export class AuthService {
       }
 
       const passwordResetToken = generateRandomToken();
-      this.usersService.update(user.id, {
+      await this.usersService.update(user.id, {
         passwordResetToken: passwordResetToken,
         passwordResetTokenExpiresAt: new Date(Date.now() + 3600000),
       });
@@ -182,7 +182,7 @@ export class AuthService {
         throw new UnauthorizedException('Verification token expired');
       }
 
-      this.usersService.update(user.id, {
+      await this.usersService.update(user.id, {
         isEmailVerified: true,
         verificationToken: null,
         verificationTokenExpiresAt: null,
@@ -216,7 +216,7 @@ export class AuthService {
       }
 
       const verificationToken = generateRandomToken();
-      this.usersService.update(user.id, {
+      await this.usersService.update(user.id, {
         verificationToken,
         verificationTokenExpiresAt: new Date(Date.now() + 3600000 * 24),
       });
@@ -269,7 +269,7 @@ export class AuthService {
       }
 
       const hashedPassword = await hashPassword(newPassword);
-      this.usersService.update(user.id, {
+      await this.usersService.update(user.id, {
         password: hashedPassword,
         isEmailVerified: true,
         verificationToken: null,
@@ -299,12 +299,34 @@ export class AuthService {
 
   login(user: User) {
     const payload = { email: user.email, sub: user.id };
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '15m',
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '30d',
+    });
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken,
     };
   }
 
-  async loginWithGoogle(token: string) {
+  refreshToken(user: User) {
+    const payload = { email: user.email, sub: user.id };
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '15m',
+    });
+
+    return {
+      access_token: accessToken,
+    };
+  }
+
+  async loginOAuth(token: string) {
     const config = this.configService.get('config') as Configuration;
     if (
       !(await this.jwtService.verifyAsync(token, {
@@ -313,7 +335,7 @@ export class AuthService {
     ) {
       throw new UnauthorizedException('Invalid Google token');
     }
-    const decoded: GoogleIdTokenPayload = this.jwtService.decode(token);
+    const decoded: OauthIdTokenPayload = this.jwtService.decode(token);
 
     if (!decoded || !decoded.email) {
       throw new UnauthorizedException('Invalid Google token payload');
