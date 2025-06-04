@@ -357,6 +357,6 @@ export class AuthService {
       throw new ConflictException('Email not verified');
     }
 
-    return this.login(user);
+    return this.refreshToken(user);
   }
 }
