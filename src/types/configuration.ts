@@ -29,5 +29,6 @@ export interface Configuration {
     strategy: 'console' | 'resend';
     resendApiKey?: string;
     fromEmail?: string;
+    contact?: string;
   };
 }

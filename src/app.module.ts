@@ -18,6 +18,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { EmailService } from './services/email/email.service';
 import { EmailModule } from './services/email/email.module';
+import { ContactModule } from './resources/contact/contact.module';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -72,6 +73,7 @@ const envFileExists = fs.existsSync(envPath);
     AuthModule,
     UsersModule,
     EmailModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],

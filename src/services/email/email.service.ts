@@ -44,6 +44,10 @@ export class EmailService {
     };
   }
 
+  async sendEmail(to: string, subject: string, html: string): Promise<void> {
+    await this.strategy.send(to, subject, html);
+  }
+
   async sendVerificationEmail(
     to: string,
     name: string,

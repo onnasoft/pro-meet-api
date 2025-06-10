@@ -39,6 +39,7 @@ export default registerAs('config', (): Configuration => {
         (process.env.EMAIL_STRATEGY as 'console' | 'resend') || 'console',
       resendApiKey: process.env.RESEND_API_KEY,
       fromEmail: process.env.FROM_EMAIL,
+      contact: process.env.CONTACT_EMAIL || '',
     },
   };
 });

@@ -50,6 +50,13 @@ class EnvironmentVariables {
   FROM_EMAIL: string;
 
   @IsString()
+  @IsNotEmpty({ message: 'CONTACT_EMAIL is required' })
+  @Matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
+    message: 'CONTACT_EMAIL must be a valid email address',
+  })
+  CONTACT_EMAIL: string;
+
+  @IsString()
   @IsNotEmpty({ message: 'EMAIL_STRATEGY is required' })
   @IsIn(['console', 'resend'], {
     message: 'EMAIL_STRATEGY must be either console or resend',

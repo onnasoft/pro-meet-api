@@ -326,37 +326,63 @@ export class AuthService {
     };
   }
 
-  async loginOAuth(token: string) {
+  async verifyToken(token: string) {
     const config = this.configService.get('config') as Configuration;
-    if (
-      !(await this.jwtService.verifyAsync(token, {
+    try {
+      const decoded = await this.jwtService.verifyAsync(token, {
         secret: config.secret,
-      }))
-    ) {
-      throw new UnauthorizedException('Invalid Google token');
-    }
-    const decoded: OauthIdTokenPayload = this.jwtService.decode(token);
-
-    if (!decoded || !decoded.email) {
-      throw new UnauthorizedException('Invalid Google token payload');
-    }
-
-    let user = await this.usersService.findOne({
-      where: { email: decoded.email },
-      select: ['id', 'email', 'name', 'isEmailVerified'],
-    });
-
-    if (!user) {
-      user = await this.usersService.create({
-        email: decoded.email,
-        name: decoded.name,
-        password: await hashPassword(generateRandomToken()),
-        isEmailVerified: true,
       });
-    } else if (!user.isEmailVerified) {
-      throw new ConflictException('Email not verified');
+      return decoded;
+    } catch (error) {
+      this.logger.error(
+        `Token verification failed: ${error.message}`,
+        error.stack,
+      );
+      throw new UnauthorizedException('Invalid or expired token');
     }
+  }
 
-    return this.refreshToken(user);
+  async loginOAuth(token: string) {
+    try {
+      const decoded: OauthIdTokenPayload = await this.verifyToken(token);
+
+      if (!decoded || !decoded.email) {
+        throw new UnauthorizedException('Invalid Google token payload');
+      }
+
+      let user = await this.usersService.findOne({
+        where: { email: decoded.email },
+        select: ['id', 'email', 'name', 'isEmailVerified'],
+      });
+
+      if (!user) {
+        user = await this.usersService.create({
+          email: decoded.email,
+          name: decoded.name,
+          password: await hashPassword(generateRandomToken()),
+          isEmailVerified: true,
+        });
+      } else if (!user.isEmailVerified) {
+        throw new ConflictException('Email not verified');
+      }
+
+      return this.refreshToken(user);
+    } catch (error) {
+      this.logger.error(
+        `Error during OAuth login with token ${token}: ${error.message}`,
+        error.stack,
+      );
+
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof ConflictException
+      ) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'OAuth login failed. Please try again later.',
+      );
+    }
   }
 }
