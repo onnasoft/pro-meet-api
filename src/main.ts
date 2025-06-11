@@ -1,6 +1,8 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { RolesGuard } from './guards/roles/roles.guard';
+import { JwtAuthGuard } from './guards/jwt-auth-guard/jwt-auth-guard.guard';
 
 async function bootstrap() {
   const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
@@ -12,6 +14,11 @@ async function bootstrap() {
     origin: origins,
     credentials: true,
   });
+
+  app.useGlobalGuards(
+    new JwtAuthGuard(app.get(Reflector)),
+    new RolesGuard(app.get(Reflector)),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Pro Meet API')

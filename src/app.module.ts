@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { Module } from '@nestjs/common';
 import {
   ConfigModule,
@@ -12,13 +13,13 @@ import { validate } from './config/config.schema';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@/config/config.service';
 import { Configuration } from './types/configuration';
-import * as fs from 'fs';
 import { User } from './entities/User';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { EmailService } from './services/email/email.service';
 import { EmailModule } from './services/email/email.module';
 import { ContactModule } from './resources/contact/contact.module';
+import { AccountModule } from './resources/account/account.module';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -74,6 +75,7 @@ const envFileExists = fs.existsSync(envPath);
     UsersModule,
     EmailModule,
     ContactModule,
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],

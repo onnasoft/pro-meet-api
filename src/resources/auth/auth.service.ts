@@ -18,6 +18,7 @@ import { EmailService } from '@/services/email/email.service';
 import { OauthIdTokenPayload } from '@/types/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Configuration } from '@/types/configuration';
+import { Role } from '@/types/role';
 
 @Injectable()
 export class AuthService {
@@ -298,27 +299,24 @@ export class AuthService {
   }
 
   login(user: User) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id, role: Role.User };
 
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '15m',
+    const access_token = this.jwtService.sign(payload, {
+      expiresIn: '1h',
     });
 
-    const refreshToken = this.jwtService.sign(payload, {
+    const refresh_token = this.jwtService.sign(payload, {
       expiresIn: '30d',
     });
 
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
+    return { access_token, refresh_token };
   }
 
   refreshToken(user: User) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id, role: Role.User };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '15m',
+      expiresIn: '1h',
     });
 
     return {

@@ -36,6 +36,26 @@ export class User {
   @Column({ nullable: true, type: 'timestamp' })
   passwordResetTokenExpiresAt: Date | null;
 
+  @Column({
+    type: 'enum',
+    enum: ['es', 'en', 'fr', 'ja', 'zh'],
+    default: 'en',
+  })
+  language: string;
+
+  @Column({ type: 'varchar', length: 100, default: 'UTC' })
+  timezone: string;
+
+  @Column({ default: false })
+  newsletter?: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: ['free', 'basic', 'pro', 'premium'],
+    default: 'free',
+  })
+  plan: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

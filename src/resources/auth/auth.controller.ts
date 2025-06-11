@@ -6,6 +6,7 @@ import {
   UseGuards,
   Request,
   Get,
+  SetMetadata,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
@@ -21,6 +22,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from '@/entities/User';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { ForgotPasswordAuthDto } from './dto/forgot-password-auth.dto';
+import { Public } from '@/utils/secure';
+import { Role } from '@/types/role';
 
 class RegisterResponseDto {
   @ApiResponseProperty()
@@ -37,6 +40,7 @@ class LoginResponseDto {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('/register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({
@@ -57,6 +61,7 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
+  @Public()
   @UseGuards(AuthGuard('local'))
   @ApiOperation({ summary: 'User login' })
   @ApiResponse({
@@ -78,6 +83,7 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  @Public()
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'OAuth login' })
   @ApiResponse({
@@ -98,11 +104,13 @@ export class AuthController {
     return this.authService.refreshToken(req.user);
   }
 
+  @Public()
   @Post('/oauth/login')
   loginOAuth(@Body('token') token: string) {
     return this.authService.loginOAuth(token);
   }
 
+  @Public()
   @Post('/forgot-password')
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({
@@ -118,6 +126,7 @@ export class AuthController {
     return this.authService.forgotPassword(email);
   }
 
+  @Public()
   @Post('/verify-email')
   @ApiOperation({ summary: 'Verify user email' })
   @ApiResponse({
@@ -138,6 +147,7 @@ export class AuthController {
     };
   }
 
+  @Public()
   @Post('/resend-verification')
   @ApiOperation({ summary: 'Resend email verification' })
   @ApiResponse({
@@ -158,6 +168,7 @@ export class AuthController {
     };
   }
 
+  @Public()
   @Post('/reset-password')
   @ApiOperation({ summary: 'Reset user password' })
   @ApiResponse({
@@ -181,7 +192,7 @@ export class AuthController {
     };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @SetMetadata('roles', [Role.User, Role.Admin])
   @Get('/me')
   @ApiOperation({ summary: 'Get user session' })
   @ApiResponse({
@@ -199,7 +210,6 @@ export class AuthController {
   })
   @ApiResponseProperty({ type: User })
   async me(@Request() req: Express.Request & { user: User }) {
-    console.log('User session:', req.user);
     return {
       user: req.user,
       message: 'User session retrieved successfully',

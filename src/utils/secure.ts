@@ -1,3 +1,4 @@
+import { SetMetadata } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 
@@ -19,3 +20,6 @@ export async function comparePassword(
 export function generateRandomToken(): string {
   return randomBytes(32).toString('hex');
 }
+
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
