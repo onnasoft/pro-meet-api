@@ -13,6 +13,7 @@ import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Role } from '@/types/role';
 import { User } from '@/entities/User';
 import { ValidationPipe } from '@/pipes/validation.pipe';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('account')
 export class AccountController {
@@ -42,6 +43,21 @@ export class AccountController {
     }
 
     return this.accountService.update(req.user.id, payload);
+  }
+
+  @SetMetadata('roles', [Role.User, Role.Admin])
+  @ApiOperation({ summary: 'Change user password' })
+  @ApiBody({ type: UpdatePasswordDto })
+  @Patch('/password')
+  async password(
+    @Request() req: Express.Request & { user: User },
+    @Body(new ValidationPipe()) payload: UpdatePasswordDto,
+  ) {
+    if (!req.user || !req.user.id) {
+      throw new Error('User not authenticated');
+    }
+
+    return this.accountService.updatePassword(req.user.id, payload);
   }
 
   @SetMetadata('roles', [Role.User])
