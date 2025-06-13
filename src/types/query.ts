@@ -78,7 +78,8 @@ export function buildFindManyOptions<T>(
 
   for (const key in query) {
     if (key.startsWith('where[')) {
-      const path = key.match(/where\[(\w+)\](?:\[(\w+)\])?/);
+      const regex = /where\[(\w+)\](?:\[(\w+)\])?/;
+      const path = regex.exec(key);
       if (!path) continue;
 
       const [, field, op] = path;
