@@ -38,5 +38,9 @@ export default registerAs('config', (): Configuration => {
       fromEmail: process.env.FROM_EMAIL,
       contact: process.env.CONTACT_EMAIL || '',
     },
+    stripe: {
+      secretKey: process.env.STRIPE_SECRET_KEY!,
+      webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+    },
   };
 });

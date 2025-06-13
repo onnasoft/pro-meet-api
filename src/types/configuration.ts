@@ -18,4 +18,8 @@ export interface Configuration {
     fromEmail?: string;
     contact?: string;
   };
+  stripe: {
+    secretKey: string;
+    webhookSecret: string;
+  };
 }

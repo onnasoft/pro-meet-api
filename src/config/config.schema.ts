@@ -136,6 +136,20 @@ class EnvironmentVariables {
   })
   @IsNotEmpty({ message: 'REDIS_URL is required (redis://host:port)' })
   REDIS_URL: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'STRIPE_SECRET_KEY is required' })
+  @MinLength(32, {
+    message: 'STRIPE_SECRET_KEY must be at least 32 characters long',
+  })
+  STRIPE_SECRET_KEY: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'STRIPE_WEBHOOK_SECRET is required' })
+  @MinLength(32, {
+    message: 'STRIPE_WEBHOOK_SECRET must be at least 32 characters long',
+  })
+  STRIPE_WEBHOOK_SECRET: string;
 }
 
 export function validate(config: Record<string, unknown>) {

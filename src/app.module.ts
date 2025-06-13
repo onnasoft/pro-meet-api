@@ -13,7 +13,6 @@ import { validate } from './config/config.schema';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@/config/config.service';
 import { Configuration } from './types/configuration';
-import { User } from './entities/User';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { EmailService } from './services/email/email.service';
@@ -21,6 +20,8 @@ import { EmailModule } from './services/email/email.module';
 import { ContactModule } from './resources/contact/contact.module';
 import { AccountModule } from './resources/account/account.module';
 import { NotificationsModule } from './resources/notifications/notifications.module';
+import { StripeModule } from './resources/stripe/stripe.module';
+import { User } from './entities/User';
 import { Notification } from './entities/Notification';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
@@ -71,6 +72,7 @@ const envFileExists = fs.existsSync(envPath);
     ContactModule,
     AccountModule,
     NotificationsModule,
+    StripeModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],
