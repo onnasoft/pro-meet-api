@@ -4,12 +4,18 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
-import { EmailService } from '@/services/email/email.service';
 import { JwtStrategy } from './jwt.strategy';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { EmailModule } from '@/services/email/email.module';
 
 @Module({
   controllers: [AuthController],
-  imports: [UsersModule, PassportModule.register({ defaultStrategy: 'local' })],
-  providers: [AuthService, LocalStrategy, JwtStrategy, EmailService],
+  imports: [
+    UsersModule,
+    EmailModule,
+    NotificationsModule,
+    PassportModule.register({ defaultStrategy: 'local' }),
+  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
 })
 export class AuthModule {}

@@ -20,6 +20,8 @@ import { EmailService } from './services/email/email.service';
 import { EmailModule } from './services/email/email.module';
 import { ContactModule } from './resources/contact/contact.module';
 import { AccountModule } from './resources/account/account.module';
+import { NotificationsModule } from './resources/notifications/notifications.module';
+import { Notification } from './entities/Notification';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -36,19 +38,11 @@ const envFileExists = fs.existsSync(envPath);
     TypeOrmModule.forRootAsync({
       useFactory(configService: ConfigService) {
         const configuration = configService.get('config') as Configuration;
-        const database = configuration.database;
-
-        const config = {
-          type: database.driver,
-          host: database.host,
-          port: database.port,
-          username: database.username,
-          password: database.password,
-          database: database.database,
-          entities: [User],
-          synchronize: database.synchronize,
+        return {
+          ...configuration.database,
+          entities: [User, Notification],
+          synchronize: true,
         } as TypeOrmModuleOptions;
-        return config;
       },
       inject: [NestConfigService],
     }),
@@ -76,6 +70,7 @@ const envFileExists = fs.existsSync(envPath);
     EmailModule,
     ContactModule,
     AccountModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],

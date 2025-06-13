@@ -10,8 +10,9 @@ export default registerAs('config', (): Configuration => {
     port: parseInt(process.env.PORT ?? '3200', 10),
     secret: process.env.SECRET_KEY!,
     baseUrl: process.env.BASE_URL!,
+    defaultLimit: parseInt(process.env.DEFAULT_LIMIT ?? '10', 10),
     database: {
-      driver: process.env.DB_DRIVER as any,
+      type: process.env.DB_DRIVER as any,
       host: process.env.DB_HOST!,
       port: parseInt(process.env.DB_PORT ?? '5432', 10),
       username: process.env.DB_USERNAME!,
@@ -25,10 +26,6 @@ export default registerAs('config', (): Configuration => {
           process.env.DB_EXTRA_SSL === 'true'
             ? { rejectUnauthorized: false }
             : false,
-      },
-      pool: {
-        max: parseInt(process.env.DB_POOL_MAX ?? '10', 10),
-        min: parseInt(process.env.DB_POOL_MIN ?? '0', 10),
       },
     },
     redis: {

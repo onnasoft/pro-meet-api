@@ -6,6 +6,7 @@ import {
   Delete,
   SetMetadata,
   Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { UpdateAccountDto } from './dto/update-account.dto';
@@ -24,7 +25,7 @@ export class AccountController {
   @Get()
   findMe(@Request() req: Express.Request & { user: User }) {
     if (!req.user || !req.user.id) {
-      throw new Error('User not authenticated');
+      throw new UnauthorizedException('User not authenticated');
     }
 
     return this.accountService.findOne(req.user.id);
@@ -39,7 +40,7 @@ export class AccountController {
     @Body(new ValidationPipe()) payload: UpdateAccountDto,
   ) {
     if (!req.user || !req.user.id) {
-      throw new Error('User not authenticated');
+      throw new UnauthorizedException('User not authenticated');
     }
 
     return this.accountService.update(req.user.id, payload);
@@ -54,7 +55,7 @@ export class AccountController {
     @Body(new ValidationPipe()) payload: UpdatePasswordDto,
   ) {
     if (!req.user || !req.user.id) {
-      throw new Error('User not authenticated');
+      throw new UnauthorizedException('User not authenticated');
     }
 
     return this.accountService.updatePassword(req.user.id, payload);
@@ -64,7 +65,7 @@ export class AccountController {
   @Delete()
   remove(@Request() req: Express.Request & { user: User }) {
     if (!req.user || !req.user.id) {
-      throw new Error('User not authenticated');
+      throw new UnauthorizedException('User not authenticated');
     }
     return this.accountService.removeMe(req.user.id);
   }

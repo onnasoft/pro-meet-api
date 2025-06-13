@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@/entities/User';
-import { FindOneOptions, Repository, IsNull } from 'typeorm';
+import { FindOneOptions, Repository, IsNull, FindManyOptions } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -20,15 +20,21 @@ export class UsersService {
     });
   }
 
-  findAll(options?: FindOneOptions<User>) {
-    return this.userRepository.find(
-      options || {
-        where: { deletedAt: IsNull() },
-        select: ['id', 'name', 'email'],
-        order: { createdAt: 'DESC' },
-        take: 100,
-      },
-    );
+  findAll(options?: FindManyOptions<User>) {
+    let buildOptions: FindManyOptions<User> | undefined = {
+      where: { deletedAt: IsNull() },
+      select: ['id', 'name', 'email'],
+      order: { createdAt: 'DESC' },
+      take: 100,
+    };
+    if (options) {
+      buildOptions = {
+        ...buildOptions,
+        ...options,
+        where: { ...options.where, deletedAt: IsNull() },
+      };
+    }
+    return this.userRepository.find(buildOptions);
   }
 
   findOne(options: FindOneOptions<User>) {

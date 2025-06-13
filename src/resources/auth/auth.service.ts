@@ -19,6 +19,8 @@ import { OauthIdTokenPayload } from '@/types/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Configuration } from '@/types/configuration';
 import { Role } from '@/types/role';
+import { NotificationsService } from '../notifications/notifications.service';
+import { Notification } from '@/entities/Notification';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +28,7 @@ export class AuthService {
 
   constructor(
     private readonly configService: ConfigService,
+    private readonly notificationsService: NotificationsService,
     private readonly emailService: EmailService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -53,10 +56,32 @@ export class AuthService {
         verificationTokenExpiresAt: new Date(Date.now() + 3600000 * 24),
       });
 
+      await this.notificationsService.create(
+        new Notification({
+          title: 'Welcome to ProMeet',
+          userId: newUser.id,
+          metadata: {
+            type: 'welcome',
+            message: 'Thank you for registering with ProMeet!',
+          },
+        }),
+      );
+
       await this.emailService.sendVerificationEmail(
         newUser.email,
         newUser.name,
         passwordResetToken,
+      );
+
+      await this.notificationsService.create(
+        new Notification({
+          title: 'New User Registration',
+          userId: newUser.id,
+          metadata: {
+            type: 'registration',
+            message: `New user registered with email: ${newUser.email}`,
+          },
+        }),
       );
 
       return {
@@ -101,6 +126,17 @@ export class AuthService {
         passwordResetToken,
       );
 
+      await this.notificationsService.create(
+        new Notification({
+          title: 'Password Reset Requested',
+          userId: user.id,
+          metadata: {
+            type: 'password_reset',
+            message: `Password reset requested for email: ${user.email}`,
+          },
+        }),
+      );
+
       // Here you would typically send a reset password email
       // For simplicity, we just return the user data
       return {
@@ -142,6 +178,17 @@ export class AuthService {
       if (!user.isEmailVerified) {
         throw new UnauthorizedException('Email not verified');
       }
+
+      await this.notificationsService.create(
+        new Notification({
+          title: 'User Login',
+          userId: user.id,
+          metadata: {
+            type: 'login',
+            message: `User logged in with email: ${user.email}`,
+          },
+        }),
+      );
 
       return {
         user: await this.usersService.findOne({
@@ -189,6 +236,17 @@ export class AuthService {
         verificationTokenExpiresAt: null,
       });
 
+      await this.notificationsService.create(
+        new Notification({
+          title: 'Email Verified',
+          userId: user.id,
+          metadata: {
+            type: 'email_verification',
+            message: `Email verified for user: ${user.email}`,
+          },
+        }),
+      );
+
       await this.emailService.sendWelcomeEmail(user.email);
     } catch (error) {
       this.logger.error(
@@ -226,6 +284,17 @@ export class AuthService {
         user.email,
         user.name,
         verificationToken,
+      );
+
+      await this.notificationsService.create(
+        new Notification({
+          title: 'Verification Email Resent',
+          userId: user.id,
+          metadata: {
+            type: 'verification',
+            message: `Verification email resent to: ${user.email}`,
+          },
+        }),
       );
 
       return {
@@ -278,6 +347,17 @@ export class AuthService {
         passwordResetToken: null,
         passwordResetTokenExpiresAt: null,
       });
+
+      await this.notificationsService.create(
+        new Notification({
+          title: 'Password Reset',
+          userId: user.id,
+          metadata: {
+            type: 'password_reset',
+            message: `Password successfully reset for user: ${user.email}`,
+          },
+        }),
+      );
 
       return {
         message: 'Password successfully reset',
@@ -363,6 +443,17 @@ export class AuthService {
       } else if (!user.isEmailVerified) {
         throw new ConflictException('Email not verified');
       }
+
+      await this.notificationsService.create(
+        new Notification({
+          title: 'OAuth Login',
+          userId: user.id,
+          metadata: {
+            type: 'oauth_login',
+            message: `User logged in via OAuth with email: ${user.email}`,
+          },
+        }),
+      );
 
       return this.refreshToken(user);
     } catch (error) {

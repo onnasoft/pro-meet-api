@@ -7,10 +7,15 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { UsersService } from '../users/users.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { comparePassword, hashPassword } from '@/utils/secure';
+import { NotificationsService } from '../notifications/notifications.service';
+import { Notification } from '@/entities/Notification';
 
 @Injectable()
 export class AccountService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly notificationsService: NotificationsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   findOne(id: string) {
     return this.usersService.findOne({
@@ -36,6 +41,25 @@ export class AccountService {
         error.message,
       );
     });
+
+    await this.notificationsService
+      .create(
+        new Notification({
+          title: 'Account Updated',
+          userId: id,
+          metadata: {
+            type: 'account_update',
+            message: 'Your account details have been successfully updated.',
+          },
+        }),
+      )
+      .catch((error) => {
+        throw new InternalServerErrorException(
+          'Failed to create notification for account update',
+          error.message,
+        );
+      });
+
     return this.findOne(id).catch((error) => {
       throw new InternalServerErrorException(
         'Failed to retrieve updated account',
@@ -77,6 +101,24 @@ export class AccountService {
       .catch((error) => {
         throw new InternalServerErrorException(
           'Failed to update password',
+          error.message,
+        );
+      });
+
+    await this.notificationsService
+      .create(
+        new Notification({
+          title: 'Password Updated',
+          userId: id,
+          metadata: {
+            type: 'password_update',
+            message: 'Your password has been successfully updated.',
+          },
+        }),
+      )
+      .catch((error) => {
+        throw new InternalServerErrorException(
+          'Failed to create notification for password update',
           error.message,
         );
       });
