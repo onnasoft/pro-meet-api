@@ -17,7 +17,6 @@ import {
   ApiBody,
   ApiResponseProperty,
 } from '@nestjs/swagger';
-import { ValidationPipe } from '@/pipes/validation.pipe';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@/entities/User';
 import { LoginAuthDto } from './dto/login-auth.dto';
@@ -57,7 +56,7 @@ export class AuthController {
     description: 'Validation error',
   })
   @ApiBody({ type: RegisterAuthDto })
-  async register(@Body(new ValidationPipe()) registerDto: RegisterAuthDto) {
+  async register(@Body() registerDto: RegisterAuthDto) {
     return this.authService.register(registerDto);
   }
 

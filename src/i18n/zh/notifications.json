@@ -1,0 +1,14 @@
+{
+  "welcome_title": "欢迎使用 ProMeet",
+  "welcome_message": "感谢您注册 ProMeet！",
+  "new_registration_title": "新用户注册",
+  "new_registration_message": "新用户使用邮箱 {{email}} 注册",
+  "password_reset_title": "密码重置请求",
+  "password_reset_message": "已请求重置邮箱 {{email}} 的密码",
+  "user_login_title": "用户登录",
+  "user_login_message": "用户使用邮箱 {{email}} 登录",
+  "email_verified_title": "邮箱已验证",
+  "email_verified_message": "用户 {{email}} 的邮箱已验证",
+  "verification_resent_title": "验证电子邮件已成功重新发送",
+  "verification_resent_message": "验证电子邮件已成功重新发送到: {{email}}"
+}

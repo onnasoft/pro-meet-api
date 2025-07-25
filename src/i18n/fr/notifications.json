@@ -1,0 +1,14 @@
+{
+  "welcome_title": "Bienvenue sur ProMeet",
+  "welcome_message": "Merci de vous être inscrit sur ProMeet !",
+  "new_registration_title": "Nouvel enregistrement utilisateur",
+  "new_registration_message": "Nouvel utilisateur enregistré avec l'e-mail : {{email}}",
+  "password_reset_title": "Demande de réinitialisation du mot de passe",
+  "password_reset_message": "Demande de réinitialisation du mot de passe pour l'e-mail : {{email}}",
+  "user_login_title": "Connexion de l'utilisateur",
+  "user_login_message": "Utilisateur connecté avec l'e-mail : {{email}}",
+  "email_verified_title": "Email érifié",
+  "email_verified_message": "Email vérifié pour l'utilisateur : {{email}}",
+  "verification_resent_title": "E-mail de vérification renvoyé",
+  "verification_resent_message": "E-mail de vérification renvoyé à : {{email}}"
+}

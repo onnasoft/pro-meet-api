@@ -1,0 +1,14 @@
+{
+  "welcome_title": "ProMeetへようこそ",
+  "welcome_message": "ProMeetへのご登録ありがとうございます！",
+  "new_registration_title": "新規ユーザー登録",
+  "new_registration_message": "新しいユーザーがメールアドレス {{email}} で登録されました",
+  "password_reset_title": "パスワードリセット要求",
+  "password_reset_message": "メールアドレス {{email}} のパスワードリセットが要求されました",
+  "user_login_title": "ユーザーログイン",
+  "user_login_message": "メールアドレス {{email}} でログインしました",
+  "email_verified_title": "メール確認済み",
+  "email_verified_message": "ユーザー {{email}} のメールが確認されました",
+  "verification_resent_title": "確認メールの再送信",
+  "verification_resent_message": "確認メールが再送信されました: {{email}}"
+}

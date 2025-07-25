@@ -23,9 +23,14 @@ import { NotificationsModule } from './resources/notifications/notifications.mod
 import { StripeModule } from './resources/stripe/stripe.module';
 import { User } from './entities/User';
 import { Notification } from './entities/Notification';
+import { I18nModule } from 'nestjs-i18n';
+import { CustomLangResolver } from './i18n/custom-lang.resolver';
+import * as path from 'path';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
+
+const isProd = process.env.NODE_ENV === 'production';
 
 @Module({
   imports: [
@@ -66,6 +71,14 @@ const envFileExists = fs.existsSync(envPath);
         },
       ],
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(process.cwd(), isProd ? 'dist/i18n' : 'src/i18n'),
+        watch: true,
+      },
+      resolvers: [CustomLangResolver],
+    }),
     AuthModule,
     UsersModule,
     EmailModule,
@@ -75,6 +88,6 @@ const envFileExists = fs.existsSync(envPath);
     StripeModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [AppService, EmailService, CustomLangResolver],
 })
 export class AppModule {}

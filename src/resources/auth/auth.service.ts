@@ -21,6 +21,7 @@ import { Configuration } from '@/types/configuration';
 import { Role } from '@/types/role';
 import { NotificationsService } from '../notifications/notifications.service';
 import { Notification } from '@/entities/Notification';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService {
@@ -32,16 +33,19 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly i18n: I18nService,
   ) {}
 
-  async register(registerDto: RegisterAuthDto) {
+  async register(registerDto: RegisterAuthDto, lang = 'en') {
     try {
       const existingUser = await this.usersService.findOne({
         where: { email: registerDto.email },
       });
 
       if (existingUser) {
-        throw new ConflictException('Email already registered');
+        throw new ConflictException(
+          this.i18n.translate('auth.email_already_registered', { lang }),
+        );
       }
 
       const hashedPassword = await hashPassword(registerDto.password);
@@ -58,11 +62,15 @@ export class AuthService {
 
       await this.notificationsService.create(
         new Notification({
-          title: 'Welcome to ProMeet',
+          title: await this.i18n.translate('notifications.welcome_title', {
+            lang,
+          }),
           userId: newUser.id,
           metadata: {
             type: 'welcome',
-            message: 'Thank you for registering with ProMeet!',
+            message: this.i18n.translate('notifications.welcome_message', {
+              lang,
+            }),
           },
         }),
       );
@@ -75,18 +83,25 @@ export class AuthService {
 
       await this.notificationsService.create(
         new Notification({
-          title: 'New User Registration',
+          title: await this.i18n.translate(
+            'notifications.new_registration_title',
+            { lang },
+          ),
           userId: newUser.id,
           metadata: {
             type: 'registration',
-            message: `New user registered with email: ${newUser.email}`,
+            message: this.i18n.translate(
+              'notifications.new_registration_message',
+              { lang, args: { email: newUser.email } },
+            ),
           },
         }),
       );
 
       return {
-        message:
-          'Registration successful. Please check your email to verify your account.',
+        message: this.i18n.translate('auth.registration_success', {
+          lang,
+        }),
       };
     } catch (error) {
       this.logger.error(
@@ -99,12 +114,12 @@ export class AuthService {
       }
 
       throw new InternalServerErrorException(
-        'Registration failed. Please try again later.',
+        this.i18n.translate('auth.registration_failed', { lang }),
       );
     }
   }
 
-  async forgotPassword(email: string) {
+  async forgotPassword(email: string, lang = 'en') {
     try {
       const user = await this.usersService.findOne({
         where: { email },
@@ -112,12 +127,14 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new UnauthorizedException('User not found');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.user_not_found', { lang }),
+        );
       }
 
       const passwordResetToken = generateRandomToken();
       await this.usersService.update(user.id, {
-        passwordResetToken: passwordResetToken,
+        passwordResetToken,
         passwordResetTokenExpiresAt: new Date(Date.now() + 3600000),
       });
 
@@ -128,19 +145,25 @@ export class AuthService {
 
       await this.notificationsService.create(
         new Notification({
-          title: 'Password Reset Requested',
+          title: await this.i18n.translate(
+            'notifications.password_reset_title',
+            { lang },
+          ),
           userId: user.id,
           metadata: {
             type: 'password_reset',
-            message: `Password reset requested for email: ${user.email}`,
+            message: this.i18n.translate(
+              'notifications.password_reset_message',
+              { lang, args: { email: user.email } },
+            ),
           },
         }),
       );
 
-      // Here you would typically send a reset password email
-      // For simplicity, we just return the user data
       return {
-        message: 'Password reset link sent to your email',
+        message: this.i18n.translate('auth.password_reset_link_sent', {
+          lang,
+        }),
         user,
       };
     } catch (error) {
@@ -154,12 +177,12 @@ export class AuthService {
       }
 
       throw new InternalServerErrorException(
-        'Failed to process forgot password request. Please try again later.',
+        this.i18n.translate('auth.password_reset_failed', { lang }),
       );
     }
   }
 
-  async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string, lang = 'en') {
     try {
       const user = await this.usersService.findOne({
         where: { email },
@@ -176,16 +199,23 @@ export class AuthService {
       }
 
       if (!user.isEmailVerified) {
-        throw new UnauthorizedException('Email not verified');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.email_not_verified', { lang }),
+        );
       }
 
       await this.notificationsService.create(
         new Notification({
-          title: 'User Login',
+          title: await this.i18n.translate('notifications.user_login_title', {
+            lang,
+          }),
           userId: user.id,
           metadata: {
             type: 'login',
-            message: `User logged in with email: ${user.email}`,
+            message: this.i18n.translate('notifications.user_login_message', {
+              lang,
+              args: { email: user.email },
+            }),
           },
         }),
       );
@@ -195,7 +225,7 @@ export class AuthService {
           where: { email },
           select: ['id', 'email', 'name'],
         }),
-        message: 'Login successful',
+        message: this.i18n.translate('auth.login_successful', { lang }),
       };
     } catch (error) {
       this.logger.error(
@@ -211,7 +241,7 @@ export class AuthService {
     return null;
   }
 
-  async verifyEmail(token: string) {
+  async verifyEmail(token: string, lang = 'en') {
     try {
       const user = await this.usersService.findOne({
         where: { verificationToken: token },
@@ -219,15 +249,27 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new UnauthorizedException('Invalid verification token');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.invalid_verification_token', {
+            lang,
+          }),
+        );
       }
 
       if (!user.verificationTokenExpiresAt) {
-        throw new UnauthorizedException('Verification token not found');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.verification_token_not_found', {
+            lang,
+          }),
+        );
       }
 
       if (user.verificationTokenExpiresAt < new Date()) {
-        throw new UnauthorizedException('Verification token expired');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.verification_token_expired', {
+            lang,
+          }),
+        );
       }
 
       await this.usersService.update(user.id, {
@@ -238,11 +280,17 @@ export class AuthService {
 
       await this.notificationsService.create(
         new Notification({
-          title: 'Email Verified',
+          title: await this.i18n.translate(
+            'notifications.email_verified_title',
+            { lang },
+          ),
           userId: user.id,
           metadata: {
             type: 'email_verification',
-            message: `Email verified for user: ${user.email}`,
+            message: this.i18n.translate(
+              'notifications.email_verified_message',
+              { lang, args: { email: user.email } },
+            ),
           },
         }),
       );
@@ -259,19 +307,23 @@ export class AuthService {
     }
   }
 
-  async resendVerification(email: string) {
+  async resendVerification(email: string, lang = 'en') {
     try {
       const user = await this.usersService.findOne({
         where: { email },
-        select: ['id', 'email', 'name', 'verificationToken'],
+        select: ['id', 'email', 'name', 'verificationToken', 'isEmailVerified'],
       });
 
       if (!user) {
-        throw new UnauthorizedException('User not found');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.user_not_found', { lang }),
+        );
       }
 
       if (user.isEmailVerified) {
-        throw new ConflictException('Email already verified');
+        throw new ConflictException(
+          this.i18n.translate('auth.email_already_verified', { lang }),
+        );
       }
 
       const verificationToken = generateRandomToken();
@@ -288,17 +340,25 @@ export class AuthService {
 
       await this.notificationsService.create(
         new Notification({
-          title: 'Verification Email Resent',
+          title: await this.i18n.translate(
+            'notifications.verification_resent_title',
+            { lang },
+          ),
           userId: user.id,
           metadata: {
             type: 'verification',
-            message: `Verification email resent to: ${user.email}`,
+            message: this.i18n.translate(
+              'notifications.verification_resent_message',
+              { lang, args: { email: user.email } },
+            ),
           },
         }),
       );
 
       return {
-        message: 'Verification email resent successfully',
+        message: this.i18n.translate('auth.verification_email_resent', {
+          lang,
+        }),
       };
     } catch (error) {
       this.logger.error(
@@ -314,7 +374,7 @@ export class AuthService {
       }
 
       throw new InternalServerErrorException(
-        'Failed to resend verification email. Please try again later.',
+        this.i18n.translate('auth.verification_resend_failed', { lang }),
       );
     }
   }
