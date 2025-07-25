@@ -23,6 +23,8 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { ForgotPasswordAuthDto } from './dto/forgot-password-auth.dto';
 import { Public } from '@/utils/secure';
 import { Role } from '@/types/role';
+import { I18nLang } from 'nestjs-i18n';
+import { ResendVerificationAuthDto } from './dto/resend-verification-auth.dto';
 
 class RegisterResponseDto {
   @ApiResponseProperty()
@@ -56,8 +58,11 @@ export class AuthController {
     description: 'Validation error',
   })
   @ApiBody({ type: RegisterAuthDto })
-  async register(@Body() registerDto: RegisterAuthDto) {
-    return this.authService.register(registerDto);
+  async register(
+    @Body() registerDto: RegisterAuthDto,
+    @I18nLang() lang: string,
+  ) {
+    return this.authService.register(registerDto, lang);
   }
 
   @Public()
@@ -121,8 +126,11 @@ export class AuthController {
     description: 'Validation error',
   })
   @ApiBody({ type: ForgotPasswordAuthDto })
-  async forgotPassword(@Body('email') email: string) {
-    return this.authService.forgotPassword(email);
+  async forgotPassword(
+    @Body() payload: ForgotPasswordAuthDto,
+    @I18nLang() lang: string,
+  ) {
+    return this.authService.forgotPassword(payload.email, lang);
   }
 
   @Public()
@@ -136,8 +144,8 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid or expired verification token',
   })
-  async verifyEmail(@Body('token') token: string) {
-    await this.authService.verifyEmail(token);
+  async verifyEmail(@Body('token') token: string, @I18nLang() lang: string) {
+    await this.authService.verifyEmail(token, lang);
 
     return {
       message: 'Email successfully verified',
@@ -157,8 +165,12 @@ export class AuthController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid email or user not found',
   })
-  async resendVerification(@Body('email') email: string) {
-    await this.authService.resendVerification(email);
+  @ApiBody({ type: ResendVerificationAuthDto })
+  async resendVerification(
+    @Body() payload: ResendVerificationAuthDto,
+    @I18nLang() lang: string,
+  ) {
+    await this.authService.resendVerification(payload.email, lang);
 
     return {
       message: 'Verification email resent successfully',
@@ -181,8 +193,9 @@ export class AuthController {
   async resetPassword(
     @Body('token') token: string,
     @Body('newPassword') newPassword: string,
+    @I18nLang() lang: string,
   ) {
-    await this.authService.resetPassword(token, newPassword);
+    await this.authService.resetPassword(token, newPassword, lang);
 
     return {
       message: 'Password successfully reset',

@@ -379,7 +379,7 @@ export class AuthService {
     }
   }
 
-  async resetPassword(token: string, newPassword: string) {
+  async resetPassword(token: string, newPassword: string, lang = 'en') {
     try {
       const user = await this.usersService.findOne({
         where: { passwordResetToken: token },
@@ -387,15 +387,21 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new UnauthorizedException('Invalid reset token');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.invalid_reset_token', { lang }),
+        );
       }
 
       if (!user.passwordResetTokenExpiresAt) {
-        throw new UnauthorizedException('Reset token not found');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.reset_token_not_found', { lang }),
+        );
       }
 
       if (user.passwordResetTokenExpiresAt < new Date()) {
-        throw new UnauthorizedException('Reset token expired');
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.reset_token_expired', { lang }),
+        );
       }
 
       const hashedPassword = await hashPassword(newPassword);
@@ -410,17 +416,24 @@ export class AuthService {
 
       await this.notificationsService.create(
         new Notification({
-          title: 'Password Reset',
+          title: this.i18n.translate('notifications.password_reset_title', {
+            lang,
+          }),
           userId: user.id,
           metadata: {
             type: 'password_reset',
-            message: `Password successfully reset for user: ${user.email}`,
+            message: this.i18n.translate(
+              'notifications.password_reset_message',
+              { lang, args: { email: user.email } },
+            ),
           },
         }),
       );
 
       return {
-        message: 'Password successfully reset',
+        message: this.i18n.translate('auth.password_reset_success', {
+          lang,
+        }),
       };
     } catch (error) {
       this.logger.error(
@@ -433,7 +446,7 @@ export class AuthService {
       }
 
       throw new InternalServerErrorException(
-        'Failed to reset password. Please try again later.',
+        this.i18n.translate('auth.password_reset_failed', { lang }),
       );
     }
   }
