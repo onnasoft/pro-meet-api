@@ -83,8 +83,11 @@ export class AuthController {
   })
   @ApiBody({ type: LoginAuthDto })
   @Post('/login')
-  login(@Request() req: Express.Request & { user: User }) {
-    return this.authService.login(req.user);
+  login(
+    @Request() req: Express.Request & { user: User },
+    @Body() payload: LoginAuthDto,
+  ) {
+    return this.authService.login(req.user, payload.rememberMe);
   }
 
   @Public()

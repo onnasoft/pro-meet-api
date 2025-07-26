@@ -4,16 +4,37 @@ import { createEmailStrategy } from './email-strategy.factory';
 import { EmailStrategy } from './strategies/email-strategy.interface';
 import { ConfigService } from '@nestjs/config';
 import { Configuration } from '@/types/configuration';
+import verification from './templates/verification';
+import passwordReset from './templates/password-reset';
+import welcome from './templates/welcome';
 import Handlebars from 'handlebars';
-import * as fs from 'fs';
+import translations from './translations';
+
+Handlebars.registerHelper('translate', function (key, options) {
+  const language = options.data.root.language || 'en';
+  let value = translations[language];
+
+  key.split('.').forEach((k) => {
+    value = value ? value[k] : null;
+  });
+
+  // Reemplazar variables
+  if (value && options.hash) {
+    Object.keys(options.hash).forEach((k) => {
+      value = value.replace(new RegExp(`{{${k}}}`, 'g'), options.hash[k]);
+    });
+  }
+
+  return value || key;
+});
 
 @Injectable()
 export class EmailService {
   private readonly strategy: EmailStrategy;
-  private readonly templates: {
-    verification: Handlebars.TemplateDelegate;
-    passwordReset: Handlebars.TemplateDelegate;
-    welcome: Handlebars.TemplateDelegate;
+  private readonly templates = {
+    verification,
+    passwordReset,
+    welcome,
   };
 
   constructor(@Inject() private readonly configService: ConfigService) {
@@ -22,26 +43,6 @@ export class EmailService {
       resendApiKey: config.email.resendApiKey,
       fromEmail: config.email.fromEmail,
     });
-
-    const templates = {
-      verification: fs.readFileSync(
-        'src/services/email/templates/verification.html',
-        'utf-8',
-      ),
-      passwordReset: fs.readFileSync(
-        'src/services/email/templates/password-reset.html',
-        'utf-8',
-      ),
-      welcome: fs.readFileSync(
-        'src/services/email/templates/welcome.html',
-        'utf-8',
-      ),
-    };
-    this.templates = {
-      verification: Handlebars.compile(templates.verification),
-      passwordReset: Handlebars.compile(templates.passwordReset),
-      welcome: Handlebars.compile(templates.welcome),
-    };
   }
 
   async sendEmail(to: string, subject: string, html: string): Promise<void> {
@@ -54,11 +55,24 @@ export class EmailService {
     token: string,
   ): Promise<void> {
     const config = this.configService.get('config') as Configuration;
-    const url = `${config.baseUrl}/verify-email?token=${token}`;
+    const verificationUrl = `${config.baseUrl}/verify-email?token=${token}`;
     const template = this.templates.verification;
     const html = template({
-      verification_url: url,
-      user_name: name,
+      language: 'en',
+      subject: translations['en'].emailVerification.subject,
+      user: {
+        name: name,
+      },
+      verificationUrl,
+      expirationHours: 24,
+      currentYear: new Date().getFullYear(),
+      config: {
+        socialLinks: {
+          twitter: 'https://twitter.com/promeets',
+          linkedin: 'https://linkedin.com/company/promeets',
+          facebook: 'https://facebook.com/promeets',
+        },
+      },
     });
 
     await this.strategy.send(to, 'Verify your account', html);

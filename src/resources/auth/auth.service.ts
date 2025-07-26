@@ -182,7 +182,14 @@ export class AuthService {
     }
   }
 
-  async validateUser(email: string, password: string, lang = 'en') {
+  async validateUser(
+    email: string,
+    password: string,
+    lang = 'en',
+  ): Promise<{
+    user: Partial<User> | null;
+    message?: string;
+  }> {
     try {
       const user = await this.usersService.findOne({
         where: { email },
@@ -190,12 +197,16 @@ export class AuthService {
       });
 
       if (!user) {
-        return null;
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.invalid_credentials', { lang }),
+        );
       }
 
       const isPasswordValid = await comparePassword(password, user.password);
       if (!isPasswordValid) {
-        return null;
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.invalid_credentials', { lang }),
+        );
       }
 
       if (!user.isEmailVerified) {
@@ -232,13 +243,8 @@ export class AuthService {
         `Error during login for email ${email}: ${error.message}`,
         error.stack,
       );
-
-      if (error instanceof UnauthorizedException) {
-        throw error;
-      }
+      throw error;
     }
-
-    return null;
   }
 
   async verifyEmail(token: string, lang = 'en') {
@@ -451,25 +457,30 @@ export class AuthService {
     }
   }
 
-  login(user: User) {
-    const payload = { email: user.email, sub: user.id, role: Role.User };
+  login(user: User, rememberMe: boolean = false) {
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: Role.User,
+      rememberMe: rememberMe,
+    };
 
     const access_token = this.jwtService.sign(payload, {
-      expiresIn: '1h',
+      expiresIn: rememberMe ? '30d' : '1h',
     });
 
     const refresh_token = this.jwtService.sign(payload, {
-      expiresIn: '30d',
+      expiresIn: rememberMe ? '90d' : '30d',
     });
 
     return { access_token, refresh_token };
   }
 
-  refreshToken(user: User) {
+  refreshToken(user: User, rememberMe: boolean = false) {
     const payload = { email: user.email, sub: user.id, role: Role.User };
 
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '1h',
+      expiresIn: rememberMe ? '30d' : '1h',
     });
 
     return {

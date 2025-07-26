@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="{{language}}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{subject}}</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .logo {
+            height: 50px;
+            margin-bottom: 20px;
+        }
+        .content {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .button {
+            display: inline-block;
+            background-color: #8b5cf6;
+            color: white !important;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+        /* Responsive styles */
+        @media only screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .button {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://pro-meets.com/logo.png" alt="ProMeets Logo" class="logo">
+        </div>
+        
+        <div class="content">
+            <h1>{{{translate "emailVerification.heading"}}}</h1>
+            <p>{{{translate "emailVerification.greeting" name=user.name}}}</p>
+            <p>{{{translate "emailVerification.instructions"}}}</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{verificationUrl}}" class="button">{{{translate "emailVerification.button"}}}</a>
+            </div>
+            
+            <p>{{{translate "emailVerification.alternative"}}}</p>
+            <p style="word-break: break-all;"><small><a href="{{verificationUrl}}">{{verificationUrl}}</a></small></p>
+            
+            <p>{{{translate "emailVerification.expiration" expiration=expirationHours}}}</p>
+            <p>{{{translate "emailVerification.ignore"}}}</p>
+        </div>
+        
+        <div class="footer">
+            <p>{{{translate "emailVerification.footer"}}}</p>
+            <p>{{{translate "emailVerification.copyright" year=currentYear}}}</p>
+            
+            <div style="margin-top: 20px;">
+                <a href="{{config.socialLinks.twitter}}" style="margin: 0 10px;">Twitter</a>
+                <a href="{{config.socialLinks.linkedin}}" style="margin: 0 10px;">LinkedIn</a>
+                <a href="{{config.socialLinks.facebook}}" style="margin: 0 10px;">Facebook</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
