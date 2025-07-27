@@ -25,6 +25,7 @@ import { Public } from '@/utils/secure';
 import { Role } from '@/types/role';
 import { I18nLang } from 'nestjs-i18n';
 import { ResendVerificationAuthDto } from './dto/resend-verification-auth.dto';
+import { OAuthAuthDto } from './dto/oauth-auth.dto';
 
 class RegisterResponseDto {
   @ApiResponseProperty()
@@ -83,7 +84,7 @@ export class AuthController {
   })
   @ApiBody({ type: LoginAuthDto })
   @Post('/login')
-  login(
+  async login(
     @Request() req: Express.Request & { user: User },
     @Body() payload: LoginAuthDto,
   ) {
@@ -113,8 +114,14 @@ export class AuthController {
 
   @Public()
   @Post('/oauth/login')
-  loginOAuth(@Body('token') token: string) {
-    return this.authService.loginOAuth(token);
+  OAuthLogin(@Body() payload: OAuthAuthDto) {
+    return this.authService.OAuthLogin(payload.token);
+  }
+
+  @Public()
+  @Post('/oauth/google')
+  OAuthGoogleLogin(@Body() payload: OAuthAuthDto) {
+    return this.authService.OAuthGoogleLogin(payload.token);
   }
 
   @Public()

@@ -1,3 +1,5 @@
+import { Role } from './role';
+
 export interface OauthIdTokenPayload {
   iss: 'https://accounts.google.com';
   azp: string;
@@ -12,4 +14,13 @@ export interface OauthIdTokenPayload {
   family_name: string;
   iat: number;
   exp: number;
+}
+
+export interface JWTPayload {
+  sub: string;
+  email: string;
+  role: Role;
+  rememberMe?: boolean;
+  iat?: number;
+  exp?: number;
 }

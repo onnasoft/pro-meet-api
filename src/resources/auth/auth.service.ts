@@ -22,6 +22,7 @@ import { Role } from '@/types/role';
 import { NotificationsService } from '../notifications/notifications.service';
 import { Notification } from '@/entities/Notification';
 import { I18nService } from 'nestjs-i18n';
+import { GoogleUserInfo } from '@/types/google';
 
 @Injectable()
 export class AuthService {
@@ -457,11 +458,16 @@ export class AuthService {
     }
   }
 
-  login(user: User, rememberMe: boolean = false) {
+  async login(user: User, rememberMe: boolean = false) {
+    const luser = await this.usersService.findOne({
+      where: { email: user.email },
+      select: ['id', 'email', 'role'],
+    });
+
     const payload = {
       email: user.email,
       sub: user.id,
-      role: Role.User,
+      role: luser?.role || Role.User,
       rememberMe: rememberMe,
     };
 
@@ -504,7 +510,54 @@ export class AuthService {
     }
   }
 
-  async loginOAuth(token: string) {
+  async OAuthGoogleLogin(token: string) {
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const userInfo: GoogleUserInfo = await res.json();
+
+    const user = await this.usersService.findOne({
+      where: { email: userInfo.email },
+      select: ['id', 'email', 'name', 'isEmailVerified'],
+    });
+
+    if (!user) {
+      const newUser = await this.usersService.create({
+        email: userInfo.email,
+        name: userInfo.name,
+        password: await hashPassword(generateRandomToken()),
+        isEmailVerified: true,
+      });
+
+      await this.notificationsService.create(
+        new Notification({
+          title: 'OAuth Google Login',
+          userId: newUser.id,
+          metadata: {
+            type: 'oauth_login',
+            message: `User registered via OAuth Google with email: ${newUser.email}`,
+          },
+        }),
+      );
+
+      return this.login(newUser);
+    }
+
+    if (!user.isEmailVerified) {
+      await this.usersService.update(user.id, {
+        isEmailVerified: true,
+        verificationToken: null,
+        verificationTokenExpiresAt: null,
+      });
+    }
+
+    return this.login(user);
+  }
+
+  async OAuthLogin(token: string) {
     try {
       const decoded: OauthIdTokenPayload = await this.verifyToken(token);
 

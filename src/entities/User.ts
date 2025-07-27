@@ -1,3 +1,4 @@
+import { Role } from '@/types/role';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -42,6 +43,13 @@ export class User {
     default: 'en',
   })
   language: string;
+
+  @Column({
+    type: 'enum',
+    enum: [Role.User, Role.Admin],
+    default: Role.User,
+  })
+  role: Role;
 
   @Column({ type: 'varchar', length: 100, default: 'UTC' })
   timezone: string;
