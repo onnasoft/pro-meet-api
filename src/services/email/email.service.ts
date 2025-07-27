@@ -53,15 +53,16 @@ export class EmailService {
     to: string,
     name: string,
     token: string,
+    language: string = 'en',
   ): Promise<void> {
     const config = this.configService.get('config') as Configuration;
     const verificationUrl = `${config.baseUrl}/verify-email?token=${token}`;
     const template = this.templates.verification;
     const html = template({
-      language: 'en',
-      subject: translations['en'].emailVerification.subject,
+      language,
+      subject: translations[language].emailVerification.subject,
       user: {
-        name: name,
+        name,
       },
       verificationUrl,
       expirationHours: 24,
@@ -75,27 +76,81 @@ export class EmailService {
       },
     });
 
-    await this.strategy.send(to, 'Verify your account', html);
+    await this.strategy.send(
+      to,
+      translations[language].emailVerification.subject,
+      html,
+    );
   }
 
-  async sendPasswordResetEmail(to: string, token: string): Promise<void> {
+  async sendPasswordResetEmail(
+    to: string,
+    name: string,
+    token: string,
+    language: string = 'en',
+  ): Promise<void> {
     const config = this.configService.get('config') as Configuration;
-    const url = `${config.baseUrl}/reset-password?token=${token}`;
+    const resetUrl = `${config.baseUrl}/reset-password?token=${token}`;
     const template = this.templates.passwordReset;
+
     const html = template({
-      reset_url: url,
+      language,
+      subject: translations[language].passwordReset.subject,
+      user: {
+        name,
+      },
+      resetUrl,
+      expirationHours: 24,
+      currentYear: new Date().getFullYear(),
+      config: {
+        socialLinks: {
+          twitter: 'https://twitter.com/promeets',
+          linkedin: 'https://linkedin.com/company/promeets',
+          facebook: 'https://facebook.com/promeets',
+        },
+      },
     });
 
-    console.log('Sending password reset email to:', to);
+    console.log('Sending password reset email:', {
+      to,
+      subject: translations[language].passwordReset.subject,
+      html,
+    });
 
-    await this.strategy.send(to, 'Reset your password', html);
+    await this.strategy.send(
+      to,
+      translations[language].passwordReset.subject,
+      html,
+    );
   }
 
-  async sendWelcomeEmail(to: string): Promise<void> {
+  async sendWelcomeEmail(
+    to: string,
+    name: string,
+    language: string = 'en',
+  ): Promise<void> {
     const template = this.templates.welcome;
-    const html = template({});
+    const html = template({
+      language,
+      subject: translations[language].welcome?.subject || 'Welcome to ProMeets',
+      user: {
+        name,
+      },
+      currentYear: new Date().getFullYear(),
+      config: {
+        socialLinks: {
+          twitter: 'https://twitter.com/promeets',
+          linkedin: 'https://linkedin.com/company/promeets',
+          facebook: 'https://facebook.com/promeets',
+        },
+      },
+    });
 
-    await this.strategy.send(to, 'Welcome!', html);
+    await this.strategy.send(
+      to,
+      translations[language].welcome?.subject || 'Welcome to ProMeets',
+      html,
+    );
   }
 
   async sendCustomEmail(

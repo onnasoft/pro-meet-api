@@ -141,7 +141,9 @@ export class AuthService {
 
       await this.emailService.sendPasswordResetEmail(
         user.email,
+        user.name,
         passwordResetToken,
+        lang,
       );
 
       await this.notificationsService.create(
@@ -302,7 +304,7 @@ export class AuthService {
         }),
       );
 
-      await this.emailService.sendWelcomeEmail(user.email);
+      await this.emailService.sendWelcomeEmail(user.email, user.name, lang);
     } catch (error) {
       this.logger.error(
         `Error during email verification with token ${token}: ${error.message}`,
