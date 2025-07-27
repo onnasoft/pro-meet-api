@@ -1,4 +1,4 @@
-import { defaultLanguage, Language, languages } from '@/utils/language';
+import { defaultLanguage, languages } from '@/utils/language';
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { I18nResolver } from 'nestjs-i18n';
 
@@ -22,18 +22,10 @@ export class CustomLangResolver implements I18nResolver {
       return lang;
     }
 
-    try {
-      const languageState = JSON.parse(cookies.language || '{}') as {
-        state: { language: Language };
-      };
-
-      if (!_languages.has(languageState.state.language)) {
-        return defaultLanguage;
-      }
-
-      return languageState.state.language;
-    } catch {
+    if (!_languages.has(cookies.language)) {
       return defaultLanguage;
     }
+
+    return cookies.language;
   }
 }
