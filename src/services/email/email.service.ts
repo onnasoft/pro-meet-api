@@ -111,12 +111,6 @@ export class EmailService {
       },
     });
 
-    console.log('Sending password reset email:', {
-      to,
-      subject: translations[language].passwordReset.subject,
-      html,
-    });
-
     await this.strategy.send(
       to,
       translations[language].passwordReset.subject,
