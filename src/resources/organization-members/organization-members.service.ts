@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrganizationMemberDto } from './dto/create-organization-member.dto';
-import { UpdateOrganizationMemberDto } from './dto/update-organization-member.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OrganizationMember } from '@/entities/OrganizationMember';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { Create, Update } from '@/types/models';
+import { pagination } from '@/utils/pagination';
 
 @Injectable()
 export class OrganizationMembersService {
-  create(createOrganizationMemberDto: CreateOrganizationMemberDto) {
-    return 'This action adds a new organizationMember';
+  constructor(
+    @InjectRepository(OrganizationMember)
+    private readonly organizationMemberRepository: Repository<OrganizationMember>,
+  ) {}
+
+  create(payload: Create<OrganizationMember>) {
+    const organizationMember =
+      this.organizationMemberRepository.create(payload);
+    return this.organizationMemberRepository.save(organizationMember);
   }
 
-  findAll() {
-    return `This action returns all organizationMembers`;
+  async findAll(options?: FindManyOptions<OrganizationMember>) {
+    const [organizationMembers, count] =
+      await this.organizationMemberRepository.findAndCount(options);
+
+    return pagination({
+      data: organizationMembers,
+      count,
+      skip: options?.skip,
+      take: options?.take || 10,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} organizationMember`;
+  findOne(options: FindOneOptions<OrganizationMember>) {
+    return this.organizationMemberRepository.findOne(options);
   }
 
-  update(id: number, updateOrganizationMemberDto: UpdateOrganizationMemberDto) {
-    return `This action updates a #${id} organizationMember`;
+  update(id: string, payload: Update<OrganizationMember>) {
+    return this.organizationMemberRepository.update(id, payload).then(() => {
+      return this.findOne({ where: { id } });
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} organizationMember`;
+  remove(id: string) {
+    return this.organizationMemberRepository.delete(id);
   }
 }

@@ -1,10 +1,13 @@
+import { OrganizationPlan } from '@/types/organization';
 import {
   IsString,
   IsOptional,
   IsUrl,
   IsPhoneNumber,
-  IsEmail,
   Length,
+  IsEnum,
+  IsEmail,
+  IsArray,
 } from 'class-validator';
 
 export class CreateOrganizationDto {
@@ -33,10 +36,15 @@ export class CreateOrganizationDto {
   logoUrl?: string;
 
   @IsOptional()
-  @IsEmail()
-  billingEmail?: string;
-
-  @IsOptional()
   @IsString()
   timezone?: string;
+
+  @IsOptional()
+  @IsEnum(OrganizationPlan)
+  plan: OrganizationPlan;
+
+  @IsOptional()
+  @IsArray()
+  @IsEmail({}, { each: true })
+  members: string[];
 }

@@ -58,9 +58,6 @@ export class Organization {
   @Column({ name: 'is_verified', default: false })
   isVerified: boolean;
 
-  @Column({ name: 'timezone', type: 'varchar', length: 100, default: 'UTC' })
-  timezone: string;
-
   @ManyToOne(() => User)
   @JoinColumn({ name: 'owner_id' })
   owner: User;

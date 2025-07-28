@@ -14,20 +14,7 @@ import {
 import { Organization } from './Organization';
 import { User } from './User';
 import { Task } from './Task';
-
-export enum ProjectStatus {
-  PLANNING = 'planning',
-  IN_PROGRESS = 'in_progress',
-  ON_HOLD = 'on_hold',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled',
-}
-
-export enum ProjectVisibility {
-  PRIVATE = 'private',
-  TEAM = 'team',
-  PUBLIC = 'public',
-}
+import { ProjectStatus, ProjectVisibility } from '@/types/project';
 
 @Entity('projects')
 export class Project {
@@ -38,7 +25,7 @@ export class Project {
   name: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string | null;
+  description?: string | null;
 
   @Column({ name: 'key_code', length: 10, unique: true })
   keyCode: string;
@@ -58,13 +45,13 @@ export class Project {
   visibility: ProjectVisibility;
 
   @Column({ name: 'start_date', type: 'date', nullable: true })
-  startDate: Date | null;
+  startDate?: Date | null;
 
   @Column({ name: 'due_date', type: 'date', nullable: true })
-  dueDate: Date | null;
+  dueDate?: Date | null;
 
   @Column({ name: 'logo_url', nullable: true, type: 'varchar' })
-  logoUrl: string | null;
+  logoUrl?: string | null;
 
   @Column({ name: 'is_template', default: false })
   isTemplate: boolean;

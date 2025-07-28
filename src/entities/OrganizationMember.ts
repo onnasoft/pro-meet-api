@@ -9,18 +9,7 @@ import {
 } from 'typeorm';
 import { Organization } from './Organization';
 import { User } from './User';
-
-export enum MemberRole {
-  ADMIN = 'admin',
-  MEMBER = 'member',
-  GUEST = 'guest',
-}
-
-export enum MemberStatus {
-  PENDING = 'pending',
-  ACTIVE = 'active',
-  REJECTED = 'rejected',
-}
+import { MemberRole, MemberStatus } from '@/types/organization-member';
 
 @Entity('organization_members')
 export class OrganizationMember {

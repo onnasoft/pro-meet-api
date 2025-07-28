@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Organization } from '@/entities/Organization';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { Create, Update } from '@/types/models';
+import { pagination } from '@/utils/pagination';
 
 @Injectable()
 export class OrganizationsService {
@@ -16,8 +17,16 @@ export class OrganizationsService {
     return this.organizationRepository.save(organization);
   }
 
-  findAll() {
-    return this.organizationRepository.find();
+  async findAll(options?: FindManyOptions<Organization>) {
+    const [organizations, count] =
+      await this.organizationRepository.findAndCount(options);
+
+    return pagination({
+      data: organizations,
+      count,
+      skip: options?.skip,
+      take: options?.take || 10,
+    });
   }
 
   findOne(id: string) {
