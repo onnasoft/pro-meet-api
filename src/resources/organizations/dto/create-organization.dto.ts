@@ -1,9 +1,8 @@
 import { OrganizationPlan } from '@/types/organization';
+import { IsPhoneNumberOrEmpty, IsUrlOrEmpty } from '@/utils/validation';
 import {
   IsString,
   IsOptional,
-  IsUrl,
-  IsPhoneNumber,
   Length,
   IsEnum,
   IsEmail,
@@ -20,7 +19,7 @@ export class CreateOrganizationDto {
   description?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrlOrEmpty()
   website?: string;
 
   @IsOptional()
@@ -28,11 +27,11 @@ export class CreateOrganizationDto {
   location?: string;
 
   @IsOptional()
-  @IsPhoneNumber()
+  @IsPhoneNumberOrEmpty()
   phone?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrlOrEmpty()
   logoUrl?: string;
 
   @IsOptional()
