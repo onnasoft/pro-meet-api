@@ -58,7 +58,7 @@ export class OrganizationMember {
   })
   status: MemberStatus;
 
-  @Column({ name: 'invitation_token', nullable: true })
+  @Column({ name: 'invitation_token', nullable: true, type: 'varchar' })
   invitationToken: string | null;
 
   @Column({ name: 'invitation_sent_at', nullable: true, type: 'timestamp' })

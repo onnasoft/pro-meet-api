@@ -18,14 +18,23 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { EmailService } from './services/email/email.service';
 import { EmailModule } from './services/email/email.module';
 import { ContactModule } from './resources/contact/contact.module';
-import { AccountModule } from './resources/account/account.module';
 import { NotificationsModule } from './resources/notifications/notifications.module';
 import { StripeModule } from './resources/stripe/stripe.module';
 import { User } from './entities/User';
 import { Notification } from './entities/Notification';
 import { I18nModule } from 'nestjs-i18n';
 import { CustomLangResolver } from './i18n/custom-lang.resolver';
+import { OrganizationsModule } from './resources/organizations/organizations.module';
+import { OrganizationMembersModule } from './resources/organization-members/organization-members.module';
+import { ProjectsModule } from './resources/projects/projects.module';
+import { TasksModule } from './resources/tasks/tasks.module';
+import { TaskLabelsModule } from './resources/task-labels/task-labels.module';
 import * as path from 'path';
+import { Organization } from './entities/Organization';
+import { OrganizationMember } from './entities/OrganizationMember';
+import { Project } from './entities/Project';
+import { Task } from './entities/Task';
+import { TaskLabel } from './entities/TaskLabel';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -46,7 +55,15 @@ const isProd = process.env.NODE_ENV === 'production';
         const configuration = configService.get('config') as Configuration;
         return {
           ...configuration.database,
-          entities: [User, Notification],
+          entities: [
+            User,
+            Notification,
+            Organization,
+            OrganizationMember,
+            Project,
+            Task,
+            TaskLabel,
+          ],
           synchronize: true,
         } as TypeOrmModuleOptions;
       },
@@ -83,9 +100,13 @@ const isProd = process.env.NODE_ENV === 'production';
     UsersModule,
     EmailModule,
     ContactModule,
-    AccountModule,
     NotificationsModule,
     StripeModule,
+    OrganizationsModule,
+    OrganizationMembersModule,
+    ProjectsModule,
+    TasksModule,
+    TaskLabelsModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService, CustomLangResolver],

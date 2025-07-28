@@ -13,19 +13,7 @@ import { User } from './User';
 import { OrganizationMember } from './OrganizationMember';
 import { Project } from './Project';
 import { TaskLabel } from './TaskLabel';
-
-export enum OrganizationPlan {
-  FREE = 'free',
-  TEAM = 'team',
-  BUSINESS = 'business',
-  ENTERPRISE = 'enterprise',
-}
-
-export enum OrganizationStatus {
-  ACTIVE = 'active',
-  SUSPENDED = 'suspended',
-  DELETED = 'deleted',
-}
+import { OrganizationPlan, OrganizationStatus } from '@/types/organization';
 
 @Entity('organizations')
 export class Organization {
@@ -36,22 +24,22 @@ export class Organization {
   name: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string | null;
+  description?: string | null;
 
-  @Column({ nullable: true })
-  website: string | null;
+  @Column({ nullable: true, type: 'varchar' })
+  website?: string | null;
 
-  @Column({ nullable: true })
-  location: string | null;
+  @Column({ nullable: true, type: 'varchar' })
+  location?: string | null;
 
-  @Column({ nullable: true, length: 20 })
-  phone: string | null;
+  @Column({ nullable: true, length: 20, type: 'varchar' })
+  phone?: string | null;
 
-  @Column({ name: 'logo_url', nullable: true })
-  logoUrl: string | null;
+  @Column({ name: 'logo_url', nullable: true, type: 'varchar' })
+  logoUrl?: string | null;
 
-  @Column({ name: 'billing_email', nullable: true })
-  billingEmail: string | null;
+  @Column({ name: 'billing_email', nullable: true, type: 'varchar' })
+  billingEmail?: string | null;
 
   @Column({
     type: 'enum',
@@ -73,7 +61,6 @@ export class Organization {
   @Column({ name: 'timezone', type: 'varchar', length: 100, default: 'UTC' })
   timezone: string;
 
-  // Relación con el propietario
   @ManyToOne(() => User)
   @JoinColumn({ name: 'owner_id' })
   owner: User;
@@ -81,11 +68,9 @@ export class Organization {
   @Column({ name: 'owner_id' })
   ownerId: string;
 
-  // Relación con miembros
   @OneToMany(() => OrganizationMember, (member) => member.organization)
   members: OrganizationMember[];
 
-  // Relación con proyectos
   @OneToMany(() => Project, (project) => project.organization)
   projects: Project[];
 

@@ -37,6 +37,12 @@ export class AuthService {
     private readonly i18n: I18nService,
   ) {}
 
+  async session(user: User) {
+    return this.usersService.findOne({
+      where: { email: user.email },
+    });
+  }
+
   async register(registerDto: RegisterAuthDto, lang = 'en') {
     try {
       const existingUser = await this.usersService.findOne({

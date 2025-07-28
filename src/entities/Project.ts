@@ -63,7 +63,7 @@ export class Project {
   @Column({ name: 'due_date', type: 'date', nullable: true })
   dueDate: Date | null;
 
-  @Column({ name: 'logo_url', nullable: true })
+  @Column({ name: 'logo_url', nullable: true, type: 'varchar' })
   logoUrl: string | null;
 
   @Column({ name: 'is_template', default: false })

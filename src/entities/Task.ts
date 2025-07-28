@@ -92,17 +92,7 @@ export class Task {
 
   // Relación con etiquetas (tags)
   @ManyToMany(() => TaskLabel)
-  @JoinTable({
-    name: 'task_labels',
-    joinColumn: {
-      name: 'task_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'label_id',
-      referencedColumnName: 'id',
-    },
-  })
+  @JoinTable()
   labels: TaskLabel[];
 
   @CreateDateColumn({ name: 'created_at' })

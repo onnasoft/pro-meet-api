@@ -215,7 +215,7 @@ export class AuthController {
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])
-  @Get('/me')
+  @Get('/session')
   @ApiOperation({ summary: 'Get user session' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -232,11 +232,6 @@ export class AuthController {
   })
   @ApiResponseProperty({ type: User })
   async me(@Request() req: Express.Request & { user: User }) {
-    return {
-      user: req.user,
-      message: 'User session retrieved successfully',
-      statusCode: HttpStatus.OK,
-      timestamp: new Date().toISOString(),
-    };
+    return this.authService.session(req.user);
   }
 }
