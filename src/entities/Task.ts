@@ -13,21 +13,7 @@ import {
 import { Project } from './Project';
 import { User } from './User';
 import { TaskLabel } from './TaskLabel';
-
-export enum TaskPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical',
-}
-
-export enum TaskStatus {
-  BACKLOG = 'backlog',
-  TODO = 'todo',
-  IN_PROGRESS = 'in_progress',
-  IN_REVIEW = 'in_review',
-  DONE = 'done',
-}
+import { TaskPriority, TaskStatus } from '@/types/task';
 
 @Entity('tasks')
 export class Task {
@@ -38,7 +24,7 @@ export class Task {
   title: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string | null;
+  description?: string | null;
 
   @Column({ type: 'varchar', length: 50 })
   key: string;
@@ -58,13 +44,13 @@ export class Task {
   priority: TaskPriority;
 
   @Column({ name: 'due_date', type: 'timestamp', nullable: true })
-  dueDate: Date | null;
+  dueDate?: Date | null;
 
   @Column({ name: 'estimated_hours', type: 'numeric', nullable: true })
-  estimatedHours: number | null;
+  estimatedHours?: number | null;
 
   @Column({ name: 'completed_at', type: 'timestamp', nullable: true })
-  completedAt: Date | null;
+  completedAt?: Date | null;
 
   // Relación con el proyecto
   @ManyToOne(() => Project, (project) => project.tasks)
@@ -88,7 +74,7 @@ export class Task {
   assignee: User | null;
 
   @Column({ name: 'assignee_id', nullable: true })
-  assigneeId: string | null;
+  assigneeId?: string | null;
 
   // Relación con etiquetas (tags)
   @ManyToMany(() => TaskLabel)

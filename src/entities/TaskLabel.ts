@@ -24,7 +24,7 @@ export class TaskLabel {
   color: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string | null;
+  description?: string | null;
 
   // Relación con la organización
   @ManyToOne(() => Organization, (organization) => organization.taskLabels)

@@ -1,26 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Task } from '@/entities/Task';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { Create, Update } from '@/types/models';
+import { pagination } from '@/utils/pagination';
 
 @Injectable()
 export class TasksService {
-  create(createTaskDto: CreateTaskDto) {
-    return 'This action adds a new task';
+  constructor(
+    @InjectRepository(Task)
+    private readonly tasksRepository: Repository<Task>,
+  ) {}
+
+  create(payload: Create<Task>) {
+    const task = this.tasksRepository.create(payload);
+    return this.tasksRepository.save(task);
   }
 
-  findAll() {
-    return `This action returns all tasks`;
+  async findAll(options?: FindManyOptions<Task>) {
+    const [tasks, count] = await this.tasksRepository.findAndCount(options);
+
+    return pagination({
+      data: tasks,
+      count,
+      skip: options?.skip,
+      take: options?.take || 10,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  findOne(options: FindOneOptions<Task>) {
+    return this.tasksRepository.findOne(options);
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+  update(id: string, payload: Update<Task>) {
+    return this.tasksRepository.update(id, payload).then(() => {
+      return this.findOne({ where: { id } });
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  remove(id: string) {
+    return this.tasksRepository.delete(id);
   }
 }

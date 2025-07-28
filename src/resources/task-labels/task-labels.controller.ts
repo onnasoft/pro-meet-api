@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TaskLabelsService } from './task-labels.service';
 import { CreateTaskLabelDto } from './dto/create-task-label.dto';
 import { UpdateTaskLabelDto } from './dto/update-task-label.dto';
@@ -8,8 +16,13 @@ export class TaskLabelsController {
   constructor(private readonly taskLabelsService: TaskLabelsService) {}
 
   @Post()
-  create(@Body() createTaskLabelDto: CreateTaskLabelDto) {
-    return this.taskLabelsService.create(createTaskLabelDto);
+  create(@Body() payload: CreateTaskLabelDto) {
+    return this.taskLabelsService.create({
+      name: payload.name,
+      color: payload.color,
+      description: payload.description,
+      organizationId: payload.organizationId,
+    });
   }
 
   @Get()
@@ -19,16 +32,16 @@ export class TaskLabelsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.taskLabelsService.findOne(+id);
+    return this.taskLabelsService.findOne({ where: { id } });
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskLabelDto: UpdateTaskLabelDto) {
-    return this.taskLabelsService.update(+id, updateTaskLabelDto);
+  update(@Param('id') id: string, @Body() payload: UpdateTaskLabelDto) {
+    return this.taskLabelsService.update(id, payload);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.taskLabelsService.remove(+id);
+    return this.taskLabelsService.remove(id);
   }
 }
