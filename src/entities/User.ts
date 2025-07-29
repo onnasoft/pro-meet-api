@@ -6,7 +6,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Organization } from './Organization';
 
 @Entity('users')
 export class User {
@@ -18,6 +20,9 @@ export class User {
 
   @Column({ unique: true })
   email: string;
+
+  @Column({ nullable: true, type: 'varchar' })
+  phone?: string | null;
 
   @Column({ select: false })
   password: string;
@@ -53,6 +58,17 @@ export class User {
 
   @Column({ type: 'varchar', length: 100, default: 'UTC' })
   timezone: string;
+
+  @OneToMany(() => Organization, (organization) => organization.owner, {
+    cascade: true,
+  })
+  organizations: Organization[];
+
+  @Column({ nullable: true, type: 'varchar' })
+  stripeCustomerId?: string;
+
+  @Column({ nullable: true, type: 'varchar' })
+  defaultPaymentMethodId?: string;
 
   @Column({ default: false })
   newsletter?: boolean;
