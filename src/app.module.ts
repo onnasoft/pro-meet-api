@@ -35,6 +35,9 @@ import { OrganizationMember } from './entities/OrganizationMember';
 import { Project } from './entities/Project';
 import { Task } from './entities/Task';
 import { TaskLabel } from './entities/TaskLabel';
+import { Plan } from './entities/Plan';
+import { PlanTranslation } from './entities/PlanTranslation';
+import { SeedModule } from './services/seed/seed.module';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -63,6 +66,8 @@ const isProd = process.env.NODE_ENV === 'production';
             Project,
             Task,
             TaskLabel,
+            Plan,
+            PlanTranslation,
           ],
           synchronize: true,
         } as TypeOrmModuleOptions;
@@ -102,6 +107,7 @@ const isProd = process.env.NODE_ENV === 'production';
     ContactModule,
     NotificationsModule,
     StripeModule,
+    SeedModule,
     OrganizationsModule,
     OrganizationMembersModule,
     ProjectsModule,

@@ -22,4 +22,16 @@ export interface Configuration {
     secretKey: string;
     webhookSecret: string;
   };
+
+  plans: {
+    free: {
+      id: string;
+    };
+    pro: {
+      id: string;
+    };
+    enterprise: {
+      id: string;
+    };
+  };
 }

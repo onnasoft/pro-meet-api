@@ -42,5 +42,17 @@ export default registerAs('config', (): Configuration => {
       secretKey: process.env.STRIPE_SECRET_KEY!,
       webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
     },
+
+    plans: {
+      free: {
+        id: process.env.PLAN_FREE_ID || 'free',
+      },
+      pro: {
+        id: process.env.PLAN_PRO_ID || 'pro',
+      },
+      enterprise: {
+        id: process.env.PLAN_ENTERPRISE_ID || 'enterprise',
+      },
+    },
   };
 });

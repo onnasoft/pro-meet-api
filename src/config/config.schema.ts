@@ -150,6 +150,19 @@ class EnvironmentVariables {
     message: 'STRIPE_WEBHOOK_SECRET must be at least 32 characters long',
   })
   STRIPE_WEBHOOK_SECRET: string;
+
+  // Plans Configuration
+  @IsString()
+  @IsNotEmpty({ message: 'PLAN_FREE_ID is required' })
+  PLAN_FREE_ID: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'PLAN_PRO_ID is required' })
+  PLAN_PRO_ID: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'PLAN_ENTERPRISE_ID is required' })
+  PLAN_ENTERPRISE_ID: string;
 }
 
 export function validate(config: Record<string, unknown>) {

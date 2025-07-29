@@ -48,4 +48,8 @@ export class StripeService {
     const secret = stripeConf.webhookSecret;
     return this.stripe.webhooks.constructEvent(payload, sig, secret);
   }
+
+  async getProductPrice(priceId: string): Promise<Stripe.Price> {
+    return this.stripe.prices.retrieve(priceId);
+  }
 }

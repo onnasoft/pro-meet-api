@@ -1,7 +1,6 @@
 export enum OrganizationPlan {
   FREE = 'free',
-  TEAM = 'team',
-  BUSINESS = 'business',
+  PRO = 'pro',
   ENTERPRISE = 'enterprise',
 }
 
