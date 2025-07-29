@@ -55,6 +55,9 @@ export class Organization {
   })
   status: OrganizationStatus;
 
+  @Column({ default: false })
+  current: boolean;
+
   @Column({ name: 'is_verified', default: false })
   isVerified: boolean;
 

@@ -19,6 +19,7 @@ import { OrganizationPlan, OrganizationStatus } from '@/types/organization';
 import { buildFindManyOptions, QueryParams } from '@/utils/query';
 import { Organization } from '@/entities/Organization';
 import { OrganizationMembersService } from '../organization-members/organization-members.service';
+import { MemberRole, MemberStatus } from '@/types/organization-member';
 
 @Controller('organizations')
 export class OrganizationsController {
@@ -33,6 +34,10 @@ export class OrganizationsController {
     @Request() req: Express.Request & { user: User },
     @Body() payload: CreateOrganizationDto,
   ) {
+    const existingOrganization = await this.organizationsService.findOne({
+      where: { ownerId: req.user.id, current: true },
+    });
+
     const organization = await this.organizationsService.create({
       name: payload.name,
       description: payload.description,
@@ -45,6 +50,17 @@ export class OrganizationsController {
       isVerified: false,
       plan: payload.plan || OrganizationPlan.FREE,
       status: OrganizationStatus.ACTIVE,
+      current: !existingOrganization,
+    });
+
+    await this.organizationMembersService.create({
+      userId: req.user.id,
+      organizationId: organization.id,
+      role: MemberRole.ADMIN,
+      email: req.user.email,
+      status: MemberStatus.ACTIVE,
+      invitationSentAt: null,
+      invitationToken: null,
     });
 
     return organization;
@@ -60,12 +76,27 @@ export class OrganizationsController {
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.organizationsService.findOne(id);
+    return this.organizationsService.findOne({
+      where: { id },
+    });
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Patch(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateOrganizationDto) {
+  async update(
+    @Request() req: Express.Request & { user: User },
+    @Param('id') id: string,
+    @Body() payload: UpdateOrganizationDto,
+  ) {
+    const { current } = payload;
+
+    if (current) {
+      await this.organizationsService.update(
+        { ownerId: req.user.id, current: true },
+        { current: false },
+      );
+    }
+
     return this.organizationsService.update(id, payload);
   }
 

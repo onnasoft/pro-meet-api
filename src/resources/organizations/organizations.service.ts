@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Organization } from '@/entities/Organization';
-import { FindManyOptions, Repository } from 'typeorm';
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { Create, Update } from '@/types/models';
 import { pagination } from '@/utils/pagination';
 
@@ -29,17 +35,26 @@ export class OrganizationsService {
     });
   }
 
-  findOne(id: string) {
-    return this.organizationRepository.findOne({
-      where: { id },
-      relations: ['members', 'projects', 'taskLabels'],
-    });
+  findOne(options: FindOneOptions<Organization>) {
+    return this.organizationRepository.findOne(options);
   }
 
-  update(id: string, payload: Update<Organization>) {
-    return this.organizationRepository.update(id, payload).then(() => {
-      return this.findOne(id);
-    });
+  update(
+    options: FindOptionsWhere<Organization>,
+    payload: Update<Organization>,
+  ): Promise<UpdateResult>;
+  update(
+    id: string,
+    payload: Update<Organization>,
+  ): Promise<Organization | null>;
+  update(options: any, payload: Update<Organization>) {
+    if (typeof options === 'string') {
+      return this.organizationRepository.update(options, payload).then(() => {
+        return this.findOne({ where: { id: options } });
+      });
+    }
+
+    return this.organizationRepository.update(options, payload);
   }
 
   remove(id: string) {
