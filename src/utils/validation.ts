@@ -1,9 +1,4 @@
-import {
-  isPhoneNumber,
-  isURL,
-  registerDecorator,
-  ValidationOptions,
-} from 'class-validator';
+import { isURL, registerDecorator, ValidationOptions } from 'class-validator';
 
 export function IsUrlOrEmpty(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
@@ -30,7 +25,9 @@ export function IsPhoneNumberOrEmpty(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: any) {
-          return value === '' || isPhoneNumber(value);
+          if (value === undefined || value === null || value === '')
+            return true;
+          return /^[\d\s+\-()]{7,}$/.test(value);
         },
       },
     });

@@ -9,6 +9,7 @@ import {
   SetMetadata,
   Request,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -24,12 +25,18 @@ import {
 import { Organization } from '@/entities/Organization';
 import { OrganizationMembersService } from '../organization-members/organization-members.service';
 import { MemberRole, MemberStatus } from '@/types/organization-member';
+import { StripeService } from '../stripe/stripe.service';
+import { I18nLang, I18nService } from 'nestjs-i18n';
+import { PlansService } from '../plans/plans.service';
 
 @Controller('organizations')
 export class OrganizationsController {
   constructor(
     private readonly organizationsService: OrganizationsService,
     private readonly organizationMembersService: OrganizationMembersService,
+    private readonly stripeService: StripeService,
+    private readonly plansService: PlansService,
+    private readonly i18n: I18nService,
   ) {}
 
   @SetMetadata('roles', [Role.User, Role.Admin])
@@ -37,10 +44,34 @@ export class OrganizationsController {
   async create(
     @Request() req: Express.Request & { user: User },
     @Body() payload: CreateOrganizationDto,
+    @I18nLang() lang: string,
   ) {
     const existingOrganization = await this.organizationsService.findOne({
-      where: { ownerId: req.user.id, current: true },
+      where: { ownerId: req.user.id },
     });
+
+    if (existingOrganization) {
+      throw new BadRequestException(
+        this.i18n.translate('organizations.already_exists', {
+          lang,
+        }),
+      );
+    }
+
+    const plan = await this.plansService.findOne({
+      where: { name: payload.plan.toUpperCase() },
+    });
+
+    if (!plan) {
+      throw new BadRequestException(
+        this.i18n.translate('organizations.plan_not_found', {
+          lang,
+          args: { plan: payload.plan },
+        }),
+      );
+    }
+
+    await this.stripeService.subscribeToPlan(req.user.id, plan.id);
 
     const organization = await this.organizationsService.create({
       name: payload.name,
@@ -54,7 +85,7 @@ export class OrganizationsController {
       isVerified: false,
       plan: payload.plan || OrganizationPlan.FREE,
       status: OrganizationStatus.ACTIVE,
-      current: !existingOrganization,
+      current: true,
     });
 
     await this.organizationMembersService.create({
