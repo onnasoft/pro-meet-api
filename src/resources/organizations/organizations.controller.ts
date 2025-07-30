@@ -16,7 +16,11 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { Role } from '@/types/role';
 import { User } from '@/entities/User';
 import { OrganizationPlan, OrganizationStatus } from '@/types/organization';
-import { buildFindManyOptions, QueryParams } from '@/utils/query';
+import {
+  buildFindManyOptions,
+  buildFindOneOptions,
+  QueryParams,
+} from '@/utils/query';
 import { Organization } from '@/entities/Organization';
 import { OrganizationMembersService } from '../organization-members/organization-members.service';
 import { MemberRole, MemberStatus } from '@/types/organization-member';
@@ -75,9 +79,12 @@ export class OrganizationsController {
 
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string, @Query() query: QueryParams<Organization>) {
+    const options = buildFindOneOptions(query);
+    options.where = { id };
+
     return this.organizationsService.findOne({
-      where: { id },
+      ...options,
     });
   }
 

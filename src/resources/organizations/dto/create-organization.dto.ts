@@ -1,13 +1,6 @@
 import { OrganizationPlan } from '@/types/organization';
 import { IsPhoneNumberOrEmpty, IsUrlOrEmpty } from '@/utils/validation';
-import {
-  IsString,
-  IsOptional,
-  Length,
-  IsEnum,
-  IsEmail,
-  IsArray,
-} from 'class-validator';
+import { IsString, IsOptional, Length, IsEnum } from 'class-validator';
 
 export class CreateOrganizationDto {
   @IsString()
@@ -41,9 +34,4 @@ export class CreateOrganizationDto {
   @IsOptional()
   @IsEnum(OrganizationPlan)
   plan: OrganizationPlan;
-
-  @IsOptional()
-  @IsArray()
-  @IsEmail({}, { each: true })
-  members: string[];
 }

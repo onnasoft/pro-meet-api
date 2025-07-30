@@ -22,6 +22,7 @@ import {
   In,
   Between,
   FindOptionsSelect,
+  FindOneOptions,
 } from 'typeorm';
 
 export class QueryParams<T> {
@@ -168,20 +169,12 @@ function handleSelectKey(
 export function buildFindManyOptions<
   T extends { id: string; createdAt: Date; updatedAt: Date },
 >(query: Record<string, any>): FindManyOptions<T> {
+  const baseOptions = buildFindOneOptions<T>(query);
   const options: FindManyOptions<T> = {};
-  const where: Record<string, any> = {};
 
-  Object.keys(query).forEach((key) => {
-    if (key.startsWith('where[')) {
-      handleWhereKey(key, query[key], where);
-    } else if (key.startsWith('select[')) {
-      handleSelectKey(key, query[key], options);
-    }
-  });
-
-  if (options.select) {
-    handleSelectKey('id', true, options);
-  }
+  options.select = baseOptions.select;
+  options.where = baseOptions.where;
+  options.relations = baseOptions.relations;
 
   if (query.order) {
     const order: FindOptionsOrder<T> = {};
@@ -195,6 +188,40 @@ export function buildFindManyOptions<
     options.order = order;
   } else {
     options.order = { createdAt: 'DESC' } as FindOptionsOrder<T>;
+  }
+
+  if (query.skip !== undefined) {
+    options.skip = Number(query.skip);
+  }
+
+  options.take =
+    query.limit !== undefined || query.take !== undefined
+      ? Number(query.limit ?? query.take)
+      : 10;
+
+  if (query.page !== undefined) {
+    options.skip = (Number(query.page) - 1) * options.take;
+  }
+
+  return options;
+}
+
+export function buildFindOneOptions<
+  T extends { id: string; createdAt: Date; updatedAt: Date },
+>(query: Record<string, any>): FindOneOptions<T> {
+  const options: FindOneOptions<T> = {};
+  const where: Record<string, any> = {};
+
+  Object.keys(query).forEach((key) => {
+    if (key.startsWith('where[')) {
+      handleWhereKey(key, query[key], where);
+    } else if (key.startsWith('select[')) {
+      handleSelectKey(key, query[key], options);
+    }
+  });
+
+  if (options.select) {
+    handleSelectKey('id', true, options);
   }
 
   options.relations = [];
@@ -214,19 +241,6 @@ export function buildFindManyOptions<
 
   if (Object.keys(where).length > 0) {
     options.where = where;
-  }
-
-  if (query.skip !== undefined) {
-    options.skip = Number(query.skip);
-  }
-
-  options.take =
-    query.limit !== undefined || query.take !== undefined
-      ? Number(query.limit ?? query.take)
-      : 10;
-
-  if (query.page !== undefined) {
-    options.skip = (Number(query.page) - 1) * options.take;
   }
 
   return options;
