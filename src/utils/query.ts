@@ -1,10 +1,11 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsNumber,
   IsOptional,
   IsObject,
   ValidateNested,
   IsString,
+  IsArray,
 } from 'class-validator';
 import {
   FindManyOptions,
@@ -37,16 +38,24 @@ export class QueryParams<T> {
   where?: FindOptionsWhere<T>;
 
   @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => Object)
-  relations?: Record<string, boolean>;
+  @Transform(({ value }) => {
+    return typeof value === 'string'
+      ? value.split(',').map((v) => v.trim())
+      : value;
+  })
+  @IsArray()
+  @IsString({ each: true })
+  relations?: string[];
 
   @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => Object)
-  order?: FindOptionsOrder<T>;
+  @Transform(({ value }) => {
+    return typeof value === 'string'
+      ? value.split(',').map((v) => v.trim())
+      : value;
+  })
+  @IsArray()
+  @IsString({ each: true })
+  order?: string[];
 
   @IsOptional()
   @IsNumber()
@@ -98,14 +107,13 @@ const inferValue = (value: string): any => {
   return value;
 };
 
+const regex = /where\[([\w.]+)\](?:\[(\w+)\])?/;
 function handleWhereKey(key: string, value: any, where: Record<string, any>) {
-  const regex = /where\[(\w+)\](?:\[(\w+)\])?/;
   const match = regex.exec(key);
   if (!match) return;
 
   const [, field, op] = match;
   const raw = value;
-  const inferredValue = inferValue(raw);
 
   const path = field.split('.');
   const lastField = path.pop();
@@ -113,8 +121,7 @@ function handleWhereKey(key: string, value: any, where: Record<string, any>) {
   let baseField = where;
   for (const p of path) {
     if (!where[p]) {
-      where[p] = {};
-      baseField = where[p];
+      baseField = baseField[p] = {};
     } else {
       baseField = baseField[p];
     }
@@ -122,9 +129,11 @@ function handleWhereKey(key: string, value: any, where: Record<string, any>) {
 
   if (op && operatorMap[op]) {
     baseField[lastField] = operatorMap[op](raw);
-  } else {
-    baseField[lastField] = inferredValue;
+    return;
   }
+
+  const inferredValue = inferValue(raw);
+  baseField[lastField] = inferredValue;
 }
 
 function handleSelectKey(
@@ -176,7 +185,7 @@ export function buildFindManyOptions<
 
   if (query.order) {
     const order: FindOptionsOrder<T> = {};
-    const parts = (query.order as string).split(',');
+    const parts = query.order as string[];
     parts.forEach((part) => {
       const [field, dir] = part.split(':');
       if (field && dir && ['ASC', 'DESC'].includes(dir.toUpperCase())) {
@@ -191,7 +200,7 @@ export function buildFindManyOptions<
   options.relations = [];
   if (query.relations) {
     const relations: string[] = Array.from(
-      new Set(query.relations.split(',').map((r: string) => r.trim())),
+      new Set(query.relations.map((r: string) => r.trim())),
     );
     options.relations = relations;
   }

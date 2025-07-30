@@ -56,7 +56,7 @@ export class OrganizationsController {
     await this.organizationMembersService.create({
       userId: req.user.id,
       organizationId: organization.id,
-      role: MemberRole.ADMIN,
+      role: MemberRole.OWNER,
       email: req.user.email,
       status: MemberStatus.ACTIVE,
       invitationSentAt: null,
@@ -67,7 +67,7 @@ export class OrganizationsController {
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])
-  @Get()
+  @Get('')
   async findAll(@Query() query: QueryParams<Organization>) {
     const options = buildFindManyOptions(query);
     return this.organizationsService.findAll(options);
