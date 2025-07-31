@@ -2,5 +2,8 @@
   "already_exists": "あなたはすでに組織を所有しています",
   "plan_not_found": "プランが見つかりません",
   "invite_self": "あなたは自分自身を組織に招待することはできません。",
-  "inviter_not_found": "招待者が見つかりません。"
+  "inviter_not_found": "招待者が見つかりません。",
+  "invitation_required": "招待が必要です。",
+  "organization_not_found": "組織が見つかりません。",
+  "invitation_already_exists": "このメールアドレスの招待はすでに存在します。"
 }

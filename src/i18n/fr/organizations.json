@@ -2,5 +2,8 @@
   "already_exists": "Vous possédez déjà une organisation",
   "plan_not_found": "Plan non trouvé",
   "invite_self": "Vous ne pouvez pas vous inviter à une organisation.",
-  "inviter_not_found": "Inviteur non trouvé."
+  "inviter_not_found": "Inviteur non trouvé.",
+  "invitation_required": "Invitation requise.",
+  "organization_not_found": "Organisation non trouvée.",
+  "invitation_already_exists": "Une invitation pour cet e-mail existe déjà."
 }

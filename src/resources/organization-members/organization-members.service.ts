@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrganizationMember } from '@/entities/OrganizationMember';
-import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import {
+  DeleteResult,
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { Create, Update } from '@/types/models';
 import { pagination } from '@/utils/pagination';
 
@@ -34,13 +41,34 @@ export class OrganizationMembersService {
     return this.organizationMemberRepository.findOne(options);
   }
 
-  update(id: string, payload: Update<OrganizationMember>) {
-    return this.organizationMemberRepository.update(id, payload).then(() => {
-      return this.findOne({ where: { id } });
-    });
+  update(
+    options: FindOptionsWhere<OrganizationMember>,
+    payload: Update<OrganizationMember>,
+  ): Promise<UpdateResult>;
+  update(
+    id: string,
+    payload: Update<OrganizationMember>,
+  ): Promise<OrganizationMember | null>;
+  update(
+    options: FindOptionsWhere<OrganizationMember> | string,
+    payload: Update<OrganizationMember>,
+  ) {
+    if (typeof options === 'string') {
+      return this.organizationMemberRepository
+        .update(options, payload)
+        .then(() => {
+          return this.findOne({ where: { id: options } });
+        });
+    }
+
+    return this.organizationMemberRepository.update(options, payload);
   }
 
-  remove(id: string) {
-    return this.organizationMemberRepository.delete(id);
+  remove(options: FindOptionsWhere<OrganizationMember>): Promise<DeleteResult>;
+  remove(id: string): Promise<DeleteResult>;
+  remove(
+    options: FindOptionsWhere<OrganizationMember> | string,
+  ): Promise<DeleteResult> {
+    return this.organizationMemberRepository.delete(options);
   }
 }

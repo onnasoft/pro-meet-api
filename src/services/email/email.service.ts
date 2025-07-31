@@ -173,7 +173,7 @@ export class EmailService {
     },
   ): Promise<void> {
     const config = this.configService.get('config') as Configuration;
-    const acceptUrl = `${config.baseUrl}/accept-invite?token=${options.token}`;
+    const acceptUrl = `${config.baseUrl}/invite?token=${options.token}`;
     const template = this.templates.organizationUserInvite;
 
     const html = template({

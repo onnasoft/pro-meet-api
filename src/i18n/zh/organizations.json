@@ -2,5 +2,8 @@
   "already_exists": "您已经拥有一个组织",
   "plan_not_found": "未找到计划",
   "invite_self": "您不能邀请自己加入组织。",
-  "inviter_not_found": "邀请者未找到。"
+  "inviter_not_found": "邀请者未找到。",
+  "invitation_required": "需要邀请。",
+  "organization_not_found": "未找到组织。",
+  "invitation_already_exists": "此电子邮件的邀请已存在。"
 }

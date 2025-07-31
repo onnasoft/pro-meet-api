@@ -6,14 +6,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  Unique,
 } from 'typeorm';
 import { Organization } from './Organization';
 import { User } from './User';
 import { MemberRole, MemberStatus } from '@/types/organization-member';
 
 @Entity('organization_members')
-@Unique(['organizationId', 'email'])
 export class OrganizationMember {
   @PrimaryGeneratedColumn('uuid')
   id: string;
