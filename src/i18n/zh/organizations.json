@@ -1,4 +1,6 @@
 {
   "already_exists": "您已经拥有一个组织",
-  "plan_not_found": "未找到计划"
+  "plan_not_found": "未找到计划",
+  "invite_self": "您不能邀请自己加入组织。",
+  "inviter_not_found": "邀请者未找到。"
 }

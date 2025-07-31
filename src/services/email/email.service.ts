@@ -9,6 +9,8 @@ import passwordReset from './templates/password-reset';
 import welcome from './templates/welcome';
 import Handlebars from 'handlebars';
 import translations from './translations';
+import organizationUserInvite from './templates/organization-user-invite';
+import { Language } from '@/utils/language';
 
 Handlebars.registerHelper('translate', function (key, options) {
   const language = options.data.root.language || 'en';
@@ -35,6 +37,7 @@ export class EmailService {
     verification,
     passwordReset,
     welcome,
+    organizationUserInvite,
   };
 
   constructor(@Inject() private readonly configService: ConfigService) {
@@ -51,18 +54,20 @@ export class EmailService {
 
   async sendVerificationEmail(
     to: string,
-    name: string,
-    token: string,
-    language: string = 'en',
+    options: {
+      name: string;
+      token: string;
+      language: Language;
+    },
   ): Promise<void> {
     const config = this.configService.get('config') as Configuration;
-    const verificationUrl = `${config.baseUrl}/verify-email?token=${token}`;
+    const verificationUrl = `${config.baseUrl}/verify-email?token=${options.token}`;
     const template = this.templates.verification;
     const html = template({
-      language,
-      subject: translations[language].emailVerification.subject,
+      language: options.language,
+      subject: translations[options.language].emailVerification.subject,
       user: {
-        name,
+        name: options.name,
       },
       verificationUrl,
       expirationHours: 24,
@@ -78,26 +83,28 @@ export class EmailService {
 
     await this.strategy.send(
       to,
-      translations[language].emailVerification.subject,
+      translations[options.language].emailVerification.subject,
       html,
     );
   }
 
   async sendPasswordResetEmail(
     to: string,
-    name: string,
-    token: string,
-    language: string = 'en',
+    options: {
+      name: string;
+      token: string;
+      language: Language;
+    },
   ): Promise<void> {
     const config = this.configService.get('config') as Configuration;
-    const resetUrl = `${config.baseUrl}/reset-password?token=${token}`;
+    const resetUrl = `${config.baseUrl}/reset-password?token=${options.token}`;
     const template = this.templates.passwordReset;
 
     const html = template({
-      language,
-      subject: translations[language].passwordReset.subject,
+      language: options.language || 'en',
+      subject: translations[options.language || 'en'].passwordReset.subject,
       user: {
-        name,
+        name: options.name,
       },
       resetUrl,
       expirationHours: 24,
@@ -113,23 +120,77 @@ export class EmailService {
 
     await this.strategy.send(
       to,
-      translations[language].passwordReset.subject,
+      translations[options.language].passwordReset.subject,
       html,
     );
   }
 
   async sendWelcomeEmail(
     to: string,
-    name: string,
-    language: string = 'en',
+    options: {
+      name: string;
+      language: string;
+    },
   ): Promise<void> {
+    const config = this.configService.get('config') as Configuration;
     const template = this.templates.welcome;
     const html = template({
-      language,
-      subject: translations[language].welcome?.subject || 'Welcome to ProMeets',
+      language: options.language,
+      subject:
+        translations[options.language].welcome?.subject ||
+        'Welcome to ProMeets',
       user: {
-        name,
+        name: options.name,
       },
+      currentYear: new Date().getFullYear(),
+      config: {
+        baseUrl: config.baseUrl,
+        socialLinks: {
+          twitter: 'https://twitter.com/promeets',
+          linkedin: 'https://linkedin.com/company/promeets',
+          facebook: 'https://facebook.com/promeets',
+        },
+      },
+    });
+
+    await this.strategy.send(
+      to,
+      translations[options.language].welcome?.subject || 'Welcome to ProMeets',
+      html,
+    );
+  }
+
+  async sendOrganizationInviteEmail(
+    to: string,
+    options: {
+      userName: string;
+      inviterName: string;
+      organizationName: string;
+      role: string;
+      token: string;
+      existingAccount: boolean;
+      language: Language;
+    },
+  ): Promise<void> {
+    const config = this.configService.get('config') as Configuration;
+    const acceptUrl = `${config.baseUrl}/accept-invite?token=${options.token}`;
+    const template = this.templates.organizationUserInvite;
+
+    const html = template({
+      language: options.language,
+      subject: translations[options.language].organizationInvite.subject,
+      user: {
+        name: options.userName,
+      },
+      inviter: {
+        name: options.inviterName,
+      },
+      organization: {
+        name: options.organizationName,
+      },
+      role: options.role,
+      acceptUrl,
+      existingAccount: options.existingAccount,
       currentYear: new Date().getFullYear(),
       config: {
         socialLinks: {
@@ -142,7 +203,7 @@ export class EmailService {
 
     await this.strategy.send(
       to,
-      translations[language].welcome?.subject || 'Welcome to ProMeets',
+      translations[options.language].organizationInvite.subject,
       html,
     );
   }

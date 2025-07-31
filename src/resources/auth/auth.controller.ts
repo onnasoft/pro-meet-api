@@ -19,6 +19,7 @@ import { Role } from '@/types/role';
 import { I18nLang } from 'nestjs-i18n';
 import { ResendVerificationAuthDto } from './dto/resend-verification-auth.dto';
 import { OAuthAuthDto } from './dto/oauth-auth.dto';
+import { Language } from '@/utils/language';
 
 @Controller('auth')
 export class AuthController {
@@ -28,7 +29,7 @@ export class AuthController {
   @Post('/register')
   async register(
     @Body() registerDto: RegisterAuthDto,
-    @I18nLang() lang: string,
+    @I18nLang() lang: Language = 'en',
   ) {
     return this.authService.register(registerDto, lang);
   }
@@ -66,7 +67,7 @@ export class AuthController {
   @Post('/forgot-password')
   async forgotPassword(
     @Body() payload: ForgotPasswordAuthDto,
-    @I18nLang() lang: string,
+    @I18nLang() lang: Language = 'en',
   ) {
     return this.authService.forgotPassword(payload.email, lang);
   }
@@ -87,7 +88,7 @@ export class AuthController {
   @Post('/resend-verification')
   async resendVerification(
     @Body() payload: ResendVerificationAuthDto,
-    @I18nLang() lang: string,
+    @I18nLang() lang: Language = 'en',
   ) {
     await this.authService.resendVerification(payload.email, lang);
 

@@ -23,6 +23,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { Notification } from '@/entities/Notification';
 import { I18nService } from 'nestjs-i18n';
 import { GoogleUserInfo } from '@/types/google';
+import { Language } from '@/utils/language';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +44,7 @@ export class AuthService {
     });
   }
 
-  async register(registerDto: RegisterAuthDto, lang = 'en') {
+  async register(registerDto: RegisterAuthDto, lang: Language = 'en') {
     try {
       const existingUser = await this.usersService.findOne({
         where: { email: registerDto.email },
@@ -82,11 +83,11 @@ export class AuthService {
         }),
       );
 
-      await this.emailService.sendVerificationEmail(
-        newUser.email,
-        newUser.name,
-        passwordResetToken,
-      );
+      await this.emailService.sendVerificationEmail(newUser.email, {
+        name: newUser.name,
+        token: passwordResetToken,
+        language: lang,
+      });
 
       await this.notificationsService.create(
         new Notification({
@@ -126,7 +127,7 @@ export class AuthService {
     }
   }
 
-  async forgotPassword(email: string, lang = 'en') {
+  async forgotPassword(email: string, lang: Language = 'en') {
     try {
       const user = await this.usersService.findOne({
         where: { email },
@@ -145,12 +146,11 @@ export class AuthService {
         passwordResetTokenExpiresAt: new Date(Date.now() + 3600000),
       });
 
-      await this.emailService.sendPasswordResetEmail(
-        user.email,
-        user.name,
-        passwordResetToken,
-        lang,
-      );
+      await this.emailService.sendPasswordResetEmail(user.email, {
+        name: user.name,
+        token: passwordResetToken,
+        language: lang,
+      });
 
       await this.notificationsService.create(
         new Notification({
@@ -310,7 +310,10 @@ export class AuthService {
         }),
       );
 
-      await this.emailService.sendWelcomeEmail(user.email, user.name, lang);
+      await this.emailService.sendWelcomeEmail(user.email, {
+        name: user.name,
+        language: lang,
+      });
     } catch (error) {
       this.logger.error(
         `Error during email verification with token ${token}: ${error.message}`,
@@ -322,7 +325,7 @@ export class AuthService {
     }
   }
 
-  async resendVerification(email: string, lang = 'en') {
+  async resendVerification(email: string, lang: Language = 'en') {
     try {
       const user = await this.usersService.findOne({
         where: { email },
@@ -347,11 +350,11 @@ export class AuthService {
         verificationTokenExpiresAt: new Date(Date.now() + 3600000 * 24),
       });
 
-      await this.emailService.sendVerificationEmail(
-        user.email,
-        user.name,
-        verificationToken,
-      );
+      await this.emailService.sendVerificationEmail(user.email, {
+        name: user.name,
+        token: verificationToken,
+        language: lang,
+      });
 
       await this.notificationsService.create(
         new Notification({

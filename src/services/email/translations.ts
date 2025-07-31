@@ -51,6 +51,26 @@ const translations = {
         "You're receiving this email because you recently created a ProMeets account.",
       copyright: '© {{year}} ProMeets. All rights reserved.',
     },
+    organizationInvite: {
+      heading: "You've Been Invited to Join an Organization",
+      greeting: 'Hi {name},',
+      invitedBy: "You've been invited by",
+      toJoin: 'to join',
+      description:
+        'This invitation gives you access to collaborate with the team on projects, meetings, and recruitment activities. Click the button below to accept the invitation.',
+      acceptButton: 'Accept Invitation',
+      alternative: 'Or copy and paste this link into your browser:',
+      existingAccount:
+        'Since you already have a ProMeets account, you can accept this invitation by signing in.',
+      newAccount:
+        "You'll need to create a ProMeets account to accept this invitation.",
+      securityNote:
+        "If you didn't request this invitation or don't recognize {organization}, you can ignore this email.",
+      footer:
+        'ProMeets - The all-in-one recruitment and collaboration platform',
+      copyright: '© {year} ProMeets. All rights reserved.',
+      subject: 'You have been invited to join an organization',
+    },
   },
   es: {
     emailVerification: {
@@ -101,6 +121,26 @@ const translations = {
       footer:
         'Estás recibiendo este correo porque recientemente creaste una cuenta en ProMeets.',
       copyright: '© {{year}} ProMeets. Todos los derechos reservados.',
+    },
+    organizationInvite: {
+      heading: 'Has sido invitado a unirte a una organización',
+      greeting: 'Hola {name},',
+      invitedBy: 'Has sido invitado por',
+      toJoin: 'a unirte a',
+      description:
+        'Esta invitación te da acceso para colaborar con el equipo en proyectos, reuniones y actividades de reclutamiento. Haz clic en el botón para aceptar la invitación.',
+      acceptButton: 'Aceptar Invitación',
+      alternative: 'O copia y pega este enlace en tu navegador:',
+      existingAccount:
+        'Como ya tienes una cuenta en ProMeets, puedes aceptar esta invitación iniciando sesión.',
+      newAccount:
+        'Necesitarás crear una cuenta en ProMeets para aceptar esta invitación.',
+      securityNote:
+        'Si no solicitaste esta invitación o no reconoces {organization}, puedes ignorar este correo.',
+      footer:
+        'ProMeets - La plataforma todo en uno para reclutamiento y colaboración',
+      copyright: '© {year} ProMeets. Todos los derechos reservados.',
+      subject: 'Has sido invitado a unirte a una organización',
     },
   },
   fr: {
@@ -154,8 +194,28 @@ const translations = {
         'Vous recevez cet email parce que vous avez récemment créé un compte sur ProMeets.',
       copyright: '© {{year}} ProMeets. Tous droits réservés.',
     },
+    organizationInvite: {
+      heading: 'Vous avez été invité à rejoindre une organisation',
+      greeting: 'Bonjour {name},',
+      invitedBy: 'Vous avez été invité par',
+      toJoin: 'à rejoindre',
+      description:
+        "Cette invitation vous donne accès à collaborer avec l'équipe sur des projets, réunions et activités de recrutement. Cliquez sur le bouton ci-dessous pour accepter l'invitation.",
+      acceptButton: "Accepter l'invitation",
+      alternative: 'Ou copiez-collez ce lien dans votre navigateur :',
+      existingAccount:
+        'Comme vous avez déjà un compte ProMeets, vous pouvez accepter cette invitation en vous connectant.',
+      newAccount:
+        'Vous devrez créer un compte ProMeets pour accepter cette invitation.',
+      securityNote:
+        "Si vous n'avez pas demandé cette invitation ou ne reconnaissez pas {organization}, vous pouvez ignorer cet e-mail.",
+      footer:
+        'ProMeets - La plateforme tout-en-un pour le recrutement et la collaboration',
+      copyright: '© {year} ProMeets. Tous droits réservés.',
+      subject: 'Vous avez été invité à rejoindre une organisation',
+    },
   },
-  ja: {
+  jp: {
     emailVerification: {
       subject: 'ProMeetsアカウントの確認',
       heading: 'メールアドレスの確認',
@@ -205,6 +265,27 @@ const translations = {
         'ProMeetsアカウントを最近作成したため、このメールを受信しています。',
       copyright: '© {{year}} ProMeets. 無断複写・転載を禁じます。',
     },
+    organizationInvite: {
+      heading: '組織への招待を受けました',
+      greeting: '{name}様、',
+      invitedBy: '以下の方から招待されました：',
+      toJoin: 'に参加するための招待です',
+      description:
+        'この招待により、チームとプロジェクト、ミーティング、採用活動で協力することができます。招待を受け入れるには、以下のボタンをクリックしてください。',
+      acceptButton: '招待を受け入れる',
+      alternative:
+        'または、このリンクをブラウザにコピーして貼り付けてください：',
+      existingAccount:
+        'すでにProMeetsアカウントをお持ちの場合は、サインインしてこの招待を受け入れることができます。',
+      newAccount:
+        'この招待を受け入れるには、ProMeetsアカウントを作成する必要があります。',
+      securityNote:
+        '{organization}を認識しない場合や、この招待をリクエストしていない場合は、このメールを無視してください。',
+      footer:
+        'ProMeets - 採用とコラボレーションのオールインワンプラットフォーム',
+      copyright: '© {year} ProMeets. 無断複写・転載を禁じます。',
+      subject: '組織への招待を受けました',
+    },
   },
   zh: {
     emailVerification: {
@@ -246,6 +327,24 @@ const translations = {
       support: '如果您需要任何帮助，请随时联系我们的支持团队。',
       footer: '您收到此邮件是因为您最近创建了ProMeets账户。',
       copyright: '© {{year}} ProMeets. 保留所有权利。',
+    },
+    organizationInvite: {
+      heading: '您已被邀请加入组织',
+      greeting: '您好 {{name}},',
+      invitedBy: '您被以下人员邀请：',
+      toJoin: '加入',
+      description:
+        '此邀请使您能够与团队在项目、会议和招聘活动中进行协作。请点击下面的按钮以接受邀请。',
+      acceptButton: '接受邀请',
+      alternative: '或者，将此链接复制并粘贴到您的浏览器中：',
+      existingAccount:
+        '由于您已经拥有ProMeets帐户，您可以通过登录来接受此邀请。',
+      newAccount: '您需要创建一个ProMeets帐户才能接受此邀请。',
+      securityNote:
+        '如果您没有请求此邀请或不认识{organization}，则可以忽略此电子邮件。',
+      footer: 'ProMeets - 招聘和协作的全能平台',
+      copyright: '© {year} ProMeets. 保留所有权利。',
+      subject: '您已被邀请加入组织',
     },
   },
 };

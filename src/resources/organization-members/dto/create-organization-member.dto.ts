@@ -1,13 +1,15 @@
-import { IsUUID, IsEmail, IsOptional } from 'class-validator';
+import { MemberRole } from '@/types/organization-member';
+import { IsUUID, IsEmail, IsIn, IsNotEmpty } from 'class-validator';
 
 export class CreateOrganizationMemberDto {
   @IsUUID()
   organizationId: string;
 
-  @IsOptional()
-  @IsUUID()
-  userId?: string;
-
   @IsEmail()
+  @IsNotEmpty()
   email: string;
+
+  @IsIn([MemberRole.MEMBER, MemberRole.ADMIN, MemberRole.GUEST])
+  @IsNotEmpty()
+  role: MemberRole;
 }

@@ -6,12 +6,14 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  Unique,
 } from 'typeorm';
 import { Organization } from './Organization';
 import { User } from './User';
 import { MemberRole, MemberStatus } from '@/types/organization-member';
 
 @Entity('organization_members')
+@Unique(['organizationId', 'email'])
 export class OrganizationMember {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -47,7 +49,12 @@ export class OrganizationMember {
   })
   status: MemberStatus;
 
-  @Column({ name: 'invitation_token', nullable: true, type: 'varchar' })
+  @Column({
+    name: 'invitation_token',
+    nullable: true,
+    type: 'varchar',
+    select: false,
+  })
   invitationToken: string | null;
 
   @Column({ name: 'invitation_sent_at', nullable: true, type: 'timestamp' })

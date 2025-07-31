@@ -65,21 +65,19 @@ export class QueryParams<T> {
   skip?: number;
 
   @IsOptional()
-  @IsNumber()
-  @ValidateNested()
-  @Type(() => Number)
-  take?: number;
+  @IsString()
+  take?: string;
 
   @IsOptional()
   @IsString()
-  @ValidateNested()
-  @Type(() => String)
+  limit?: string;
+
+  @IsOptional()
+  @IsString()
   locale?: string;
 
   @IsOptional()
   @IsNumber()
-  @ValidateNested()
-  @Type(() => Number)
   page?: number;
 }
 
