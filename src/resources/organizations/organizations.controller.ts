@@ -28,6 +28,7 @@ import { MemberRole, MemberStatus } from '@/types/organization-member';
 import { StripeService } from '../stripe/stripe.service';
 import { I18nLang, I18nService } from 'nestjs-i18n';
 import { PlansService } from '../plans/plans.service';
+import { Language } from '@/utils/language';
 
 @Controller('organizations')
 export class OrganizationsController {
@@ -111,8 +112,11 @@ export class OrganizationsController {
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get(':id')
   findOne(@Param('id') id: string, @Query() query: QueryParams<Organization>) {
-    const options = buildFindOneOptions(query);
-    options.where = { id };
+    const options = buildFindOneOptions<Organization>(query);
+    options.where = {
+      id,
+      ...(options.where || {}),
+    };
 
     return this.organizationsService.findOne({
       ...options,
@@ -125,8 +129,44 @@ export class OrganizationsController {
     @Request() req: Express.Request & { user: User },
     @Param('id') id: string,
     @Body() payload: UpdateOrganizationDto,
+    @I18nLang() lang: Language = 'en',
   ) {
     const { current } = payload;
+
+    if (req.user.role !== Role.Admin) {
+      const organization = await this.organizationsService.findOne({
+        where: { id },
+      });
+
+      if (!organization) {
+        throw new BadRequestException(
+          this.i18n.translate('organizations.organization_not_found', { lang }),
+        );
+      }
+
+      const organizationMember = await this.organizationMembersService.findOne({
+        where: {
+          userId: req.user.id,
+          organizationId: id,
+        },
+      });
+
+      if (!organizationMember) {
+        throw new BadRequestException(
+          this.i18n.translate('organizations.member_not_found', { lang }),
+        );
+      }
+
+      const organizationRole = organizationMember?.role;
+
+      if (![MemberRole.OWNER, MemberRole.ADMIN].includes(organizationRole)) {
+        throw new BadRequestException(
+          this.i18n.translate('organizations.invalid_permission', {
+            lang,
+          }),
+        );
+      }
+    }
 
     if (current) {
       await this.organizationsService.update(

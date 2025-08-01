@@ -23,6 +23,7 @@ import {
   Between,
   FindOptionsSelect,
   FindOneOptions,
+  IsNull,
 } from 'typeorm';
 
 export class QueryParams<T> {
@@ -81,6 +82,8 @@ export class QueryParams<T> {
   page?: number;
 }
 
+const isNull = '[isNull]';
+
 const operatorMap: Record<string, (val: any) => FindOperator<any>> = {
   gte: (val) => MoreThanOrEqual(val),
   lte: (val) => LessThanOrEqual(val),
@@ -88,7 +91,7 @@ const operatorMap: Record<string, (val: any) => FindOperator<any>> = {
   lt: (val) => LessThan(val),
   like: (val) => Like(`%${val}%`),
   ilike: (val) => ILike(`%${val}%`),
-  not: (val) => Not(val),
+  not: (val) => Not(isNull === val ? IsNull() : val),
   in: (val) => In(val.split(',')),
   notIn: (val) => Not(In(val.split(','))),
   between: (val) => {
@@ -98,6 +101,7 @@ const operatorMap: Record<string, (val: any) => FindOperator<any>> = {
 };
 
 const inferValue = (value: string): any => {
+  if (value === isNull) return IsNull();
   if (value === 'true') return true;
   if (value === 'false') return false;
   if (!isNaN(Number(value))) return Number(value);
@@ -131,8 +135,7 @@ function handleWhereKey(key: string, value: any, where: Record<string, any>) {
     return;
   }
 
-  const inferredValue = inferValue(raw);
-  baseField[lastField] = inferredValue;
+  baseField[lastField] = inferValue(raw);
 }
 
 function handleSelectKey(

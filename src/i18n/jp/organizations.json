@@ -5,5 +5,8 @@
   "inviter_not_found": "招待者が見つかりません。",
   "invitation_required": "招待が必要です。",
   "organization_not_found": "組織が見つかりません。",
-  "invitation_already_exists": "このメールアドレスの招待はすでに存在します。"
+  "invitation_already_exists": "このメールアドレスの招待はすでに存在します。",
+  "member_not_found": "メンバーが見つかりません。",
+  "invalid_status_transition": "無効なステータス遷移です。",
+  "invalid_permission": "このアクションを実行する権限がありません。"
 }

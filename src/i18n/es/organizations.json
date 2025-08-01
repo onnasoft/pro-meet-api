@@ -5,5 +5,8 @@
   "inviter_not_found": "Anfitrión no encontrado.",
   "invitation_required": "Se requiere invitación.",
   "organization_not_found": "Organización no encontrada.",
-  "invitation_already_exists": "Ya existe una invitación para este correo electrónico."
+  "invitation_already_exists": "Ya existe una invitación para este correo electrónico.",
+  "member_not_found": "Miembro no encontrado.",
+  "invalid_status_transition": "Transición de estado no válida.",
+  "invalid_permission": "No tienes permiso para realizar esta acción."
 }
