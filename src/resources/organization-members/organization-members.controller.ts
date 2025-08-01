@@ -34,7 +34,7 @@ import {
   QueryParams,
 } from '@/utils/query';
 import { OrganizationMember } from '@/entities/OrganizationMember';
-import { FindOptionsWhere, In, IsNull, Not } from 'typeorm';
+import { In, IsNull } from 'typeorm';
 
 @Controller('organization-members')
 export class OrganizationMembersController {
@@ -187,11 +187,15 @@ export class OrganizationMembersController {
       const organizationMember = await this.organizationMembersService.findOne({
         where: { id, email: req.user.email },
       });
+      if (!organizationMember) {
+        throw new UnauthorizedException(
+          this.i18n.translate('organizations.member_not_found', { lang }),
+        );
+      }
+
       const condition = { id, email: req.user.email };
       if (payload.status) {
-        const mc = new MemberStatusMachine(
-          organizationMember?.status as MemberStatus,
-        );
+        const mc = new MemberStatusMachine(organizationMember.status);
         if (!mc.canTransition(payload.status)) {
           throw new BadRequestException(
             this.i18n.translate('organizations.invalid_status_transition', {
@@ -214,32 +218,54 @@ export class OrganizationMembersController {
     @I18nLang() lang: Language = 'en',
   ) {
     if (req.user.role !== Role.Admin) {
-      const organizationMember = await this.organizationMembersService.findOne({
-        where: { id, email: req.user.email },
-        relations: ['organization', 'organization.owner'],
-      });
-      if (!organizationMember) {
+      const userOrganizationMember =
+        await this.organizationMembersService.findOne({
+          where: { id, userId: req.user.id },
+          relations: ['organization', 'organization.owner'],
+        });
+      if (!userOrganizationMember) {
         throw new UnauthorizedException(
           this.i18n.translate('organizations.member_not_found', { lang }),
         );
       }
+      const role = userOrganizationMember.role;
 
-      const condition: FindOptionsWhere<OrganizationMember> = {
-        id,
-        email: In([
-          req.user.email,
-          organizationMember.organization?.owner.email,
-        ]),
-        role: Not(MemberRole.OWNER),
-      };
-      const status =
-        req.user.email === organizationMember.organization?.owner.email
-          ? MemberStatus.CANCELED
-          : MemberStatus.REJECTED;
+      const canDo =
+        ![MemberRole.ADMIN, MemberRole.OWNER].includes(role) ||
+        userOrganizationMember.userId !== req.user.id;
+      if (!canDo) {
+        throw new BadRequestException(
+          this.i18n.translate('organizations.invalid_permission', { lang }),
+        );
+      }
 
-      return this.organizationMembersService.update(condition, {
-        status,
+      const organizationMember = await this.organizationMembersService.findOne({
+        where: { id },
+        relations: ['organization', 'organization.owner'],
       });
+      if (!organizationMember) {
+        throw new BadRequestException(
+          this.i18n.translate('organizations.member_not_found', { lang }),
+        );
+      }
+
+      if (organizationMember.role === MemberRole.OWNER) {
+        throw new BadRequestException(
+          this.i18n.translate('organizations.cannot_remove_owner', { lang }),
+        );
+      }
+
+      if (organizationMember.userId === req.user.id) {
+        return this.organizationMembersService.update(
+          { id, userId: req.user.id },
+          { status: MemberStatus.REJECTED },
+        );
+      }
+
+      return this.organizationMembersService.update(
+        { id },
+        { status: MemberStatus.CANCELED },
+      );
     }
     return this.organizationMembersService.remove(id);
   }

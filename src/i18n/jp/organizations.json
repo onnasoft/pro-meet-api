@@ -8,5 +8,6 @@
   "invitation_already_exists": "このメールアドレスの招待はすでに存在します。",
   "member_not_found": "メンバーが見つかりません。",
   "invalid_status_transition": "無効なステータス遷移です。",
-  "invalid_permission": "このアクションを実行する権限がありません。"
+  "invalid_permission": "このアクションを実行する権限がありません。",
+  "cannot_remove_owner": "組織の所有者を削除することはできません。"
 }

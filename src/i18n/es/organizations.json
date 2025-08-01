@@ -8,5 +8,6 @@
   "invitation_already_exists": "Ya existe una invitación para este correo electrónico.",
   "member_not_found": "Miembro no encontrado.",
   "invalid_status_transition": "Transición de estado no válida.",
-  "invalid_permission": "No tienes permiso para realizar esta acción."
+  "invalid_permission": "No tienes permiso para realizar esta acción.",
+  "cannot_remove_owner": "No puedes eliminar al propietario de la organización."
 }

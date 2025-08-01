@@ -8,5 +8,6 @@
   "invitation_already_exists": "An invitation for this email already exists.",
   "member_not_found": "Member not found.",
   "invalid_status_transition": "Invalid status transition.",
-  "invalid_permission": "You do not have permission to perform this action."
+  "invalid_permission": "You do not have permission to perform this action.",
+  "cannot_remove_owner": "You cannot remove the owner of the organization."
 }

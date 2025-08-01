@@ -104,8 +104,17 @@ export class OrganizationsController {
 
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get('')
-  async findAll(@Query() query: QueryParams<Organization>) {
-    const options = buildFindManyOptions(query);
+  async findAll(
+    @Request() req: Express.Request & { user: User },
+    @Query() query: QueryParams<Organization>,
+  ) {
+    const options = buildFindManyOptions<Organization>(query);
+    if (req.user.role !== Role.Admin) {
+      options.where ||= {};
+      options.where['members'] ||= {};
+      options.where['members']['userId'] = req.user.id;
+    }
+
     return this.organizationsService.findAll(options);
   }
 
