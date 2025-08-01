@@ -47,7 +47,7 @@ export class OrganizationMembersController {
   ) {}
 
   @SetMetadata('roles', [Role.User, Role.Admin])
-  @Post('invite')
+  @Post()
   async create(
     @Request() req: Express.Request & { user: User },
     @Body() payload: CreateOrganizationMemberDto,
@@ -220,8 +220,8 @@ export class OrganizationMembersController {
     if (req.user.role !== Role.Admin) {
       const userOrganizationMember =
         await this.organizationMembersService.findOne({
+          select: ['role', 'userId'],
           where: { id, userId: req.user.id },
-          relations: ['organization', 'organization.owner'],
         });
       if (!userOrganizationMember) {
         throw new UnauthorizedException(
