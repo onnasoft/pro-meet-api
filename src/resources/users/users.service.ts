@@ -20,7 +20,7 @@ export class UsersService {
     });
   }
 
-  findAll(options?: FindManyOptions<User>) {
+  findAndCount(options?: FindManyOptions<User>) {
     let buildOptions: FindManyOptions<User> | undefined = {
       where: { deletedAt: IsNull() },
       select: ['id', 'name', 'email'],

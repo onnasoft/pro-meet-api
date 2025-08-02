@@ -23,7 +23,7 @@ export class PlansService {
     return this.planRepository.save(plan);
   }
 
-  async findAll(options?: FindManyOptions<Plan>) {
+  async findAndCount(options?: FindManyOptions<Plan>) {
     const [plans, count] = await this.planRepository.findAndCount(options);
 
     return pagination({

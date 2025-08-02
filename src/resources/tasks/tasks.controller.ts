@@ -33,8 +33,8 @@ export class TasksController {
   }
 
   @Get()
-  findAll() {
-    return this.tasksService.findAll();
+  findAndCount() {
+    return this.tasksService.findAndCount();
   }
 
   @Get(':id')

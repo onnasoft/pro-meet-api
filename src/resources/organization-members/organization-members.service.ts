@@ -25,7 +25,7 @@ export class OrganizationMembersService {
     return this.organizationMemberRepository.save(organizationMember);
   }
 
-  async findAll(options?: FindManyOptions<OrganizationMember>) {
+  async findAndCount(options?: FindManyOptions<OrganizationMember>) {
     const [organizationMembers, count] =
       await this.organizationMemberRepository.findAndCount(options);
 
@@ -35,6 +35,10 @@ export class OrganizationMembersService {
       skip: options?.skip,
       take: options?.take || 10,
     });
+  }
+
+  async find(options?: FindManyOptions<OrganizationMember>) {
+    return this.organizationMemberRepository.find(options);
   }
 
   findOne(options: FindOneOptions<OrganizationMember>) {

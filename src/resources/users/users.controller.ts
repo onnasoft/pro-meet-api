@@ -38,8 +38,8 @@ export class UsersController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of users', type: [User] })
-  findAll() {
-    return this.usersService.findAll();
+  findAndCount() {
+    return this.usersService.findAndCount();
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])

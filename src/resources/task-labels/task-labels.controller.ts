@@ -26,8 +26,8 @@ export class TaskLabelsController {
   }
 
   @Get()
-  findAll() {
-    return this.taskLabelsService.findAll();
+  findAndCount() {
+    return this.taskLabelsService.findAndCount();
   }
 
   @Get(':id')

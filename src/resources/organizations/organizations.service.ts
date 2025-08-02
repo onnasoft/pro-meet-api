@@ -23,7 +23,7 @@ export class OrganizationsService {
     return this.organizationRepository.save(organization);
   }
 
-  async findAll(options?: FindManyOptions<Organization>) {
+  async findAndCount(options?: FindManyOptions<Organization>) {
     const [organizations, count] =
       await this.organizationRepository.findAndCount(options);
 

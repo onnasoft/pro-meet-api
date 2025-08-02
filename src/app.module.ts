@@ -4,6 +4,7 @@ import {
   ConfigModule,
   ConfigService as NestConfigService,
 } from '@nestjs/config';
+import * as path from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './resources/auth/auth.module';
@@ -29,7 +30,6 @@ import { OrganizationMembersModule } from './resources/organization-members/orga
 import { ProjectsModule } from './resources/projects/projects.module';
 import { TasksModule } from './resources/tasks/tasks.module';
 import { TaskLabelsModule } from './resources/task-labels/task-labels.module';
-import * as path from 'path';
 import { Organization } from './entities/Organization';
 import { OrganizationMember } from './entities/OrganizationMember';
 import { Project } from './entities/Project';
@@ -39,6 +39,9 @@ import { Plan } from './entities/Plan';
 import { PlanTranslation } from './entities/PlanTranslation';
 import { SeedModule } from './services/seed/seed.module';
 import { PlansModule } from './resources/plans/plans.module';
+import { Media } from './entities/Media';
+import { MediaModule } from './resources/media/media.module';
+import { S3Module } from './services/s3/s3.module';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -69,6 +72,7 @@ const isProd = process.env.NODE_ENV === 'production';
             TaskLabel,
             Plan,
             PlanTranslation,
+            Media,
           ],
           synchronize: true,
         } as TypeOrmModuleOptions;
@@ -115,6 +119,8 @@ const isProd = process.env.NODE_ENV === 'production';
     TasksModule,
     TaskLabelsModule,
     PlansModule,
+    MediaModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService, CustomLangResolver],

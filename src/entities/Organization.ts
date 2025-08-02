@@ -14,6 +14,7 @@ import { OrganizationMember } from './OrganizationMember';
 import { Project } from './Project';
 import { TaskLabel } from './TaskLabel';
 import { OrganizationPlan, OrganizationStatus } from '@/types/organization';
+import { Media } from './Media';
 
 @Entity('organizations')
 export class Organization {
@@ -76,6 +77,12 @@ export class Organization {
 
   @OneToMany(() => TaskLabel, (taskLabel) => taskLabel.organization)
   taskLabels: TaskLabel[];
+
+  @OneToMany(() => Media, (media) => media.organization, {
+    cascade: true,
+  })
+  @JoinColumn()
+  media: Media[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

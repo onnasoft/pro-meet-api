@@ -104,7 +104,7 @@ export class OrganizationsController {
 
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get('')
-  async findAll(
+  async findAndCount(
     @Request() req: Express.Request & { user: User },
     @Query() query: QueryParams<Organization>,
   ) {
@@ -115,7 +115,7 @@ export class OrganizationsController {
       options.where['members']['userId'] = req.user.id;
     }
 
-    return this.organizationsService.findAll(options);
+    return this.organizationsService.findAndCount(options);
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])

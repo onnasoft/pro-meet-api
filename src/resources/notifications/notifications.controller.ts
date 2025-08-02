@@ -23,9 +23,9 @@ export class NotificationsController {
 
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get()
-  async findAll(@Query() query: QueryParams<Notification>) {
+  async findAndCount(@Query() query: QueryParams<Notification>) {
     const options = buildFindManyOptions(query);
-    return this.notificationsService.findAll(options);
+    return this.notificationsService.findAndCount(options);
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])

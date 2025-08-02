@@ -28,7 +28,7 @@ export class NotificationsService {
     });
   }
 
-  async findAll(options?: FindManyOptions<Notification>) {
+  async findAndCount(options?: FindManyOptions<Notification>) {
     let buildOptions: FindManyOptions<Notification> | undefined = {
       where: { deletedAt: IsNull() },
       select: [
@@ -108,7 +108,7 @@ export class NotificationsService {
       updatedAt: new Date(),
     }));
     await this.notificationRepository.save(updatedNotifications);
-    return this.findAll(options);
+    return this.findAndCount(options);
   }
 
   remove(id: string) {

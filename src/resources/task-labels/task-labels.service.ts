@@ -17,7 +17,7 @@ export class TaskLabelsService {
     return this.taskLabelRepository.save(taskLabel);
   }
 
-  async findAll(options?: FindManyOptions<TaskLabel>) {
+  async findAndCount(options?: FindManyOptions<TaskLabel>) {
     const [taskLabels, count] =
       await this.taskLabelRepository.findAndCount(options);
 

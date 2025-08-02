@@ -17,7 +17,7 @@ export class TasksService {
     return this.tasksRepository.save(task);
   }
 
-  async findAll(options?: FindManyOptions<Task>) {
+  async findAndCount(options?: FindManyOptions<Task>) {
     const [tasks, count] = await this.tasksRepository.findAndCount(options);
 
     return pagination({

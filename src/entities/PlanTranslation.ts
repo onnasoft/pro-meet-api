@@ -39,7 +39,7 @@ export class PlanTranslation {
   @JoinColumn({ name: 'planId' })
   plan: Plan;
 
-  @Column()
+  @Column({ type: 'uuid' })
   planId: string;
 
   @CreateDateColumn()

@@ -24,8 +24,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getResponse()
         : (exception as any)?.message || exception;
 
-    this.logger.error(`Exception: ${message.message}`);
+    if (typeof message === 'object') {
+      this.logger.error(`Exception: ${message.message}`);
+      response.status(status).json(message);
+      return;
+    }
 
-    response.status(status).json(message);
+    this.logger.error(`Exception: ${message}`);
+    response.status(status).json({ message });
   }
 }

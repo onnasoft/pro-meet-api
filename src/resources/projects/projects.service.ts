@@ -17,7 +17,7 @@ export class ProjectsService {
     return this.projectsRepository.save(project);
   }
 
-  async findAll(options?: FindManyOptions<Project>) {
+  async findAndCount(options?: FindManyOptions<Project>) {
     const [projects, count] =
       await this.projectsRepository.findAndCount(options);
 

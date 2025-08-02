@@ -131,7 +131,7 @@ export class OrganizationMembersController {
   @Public()
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get('')
-  async findAll(
+  async findAndCount(
     @Request() req: Express.Request & { user?: User },
     @Query() query: QueryParams<OrganizationMember>,
     @I18nLang() lang: Language = 'en',
@@ -153,7 +153,7 @@ export class OrganizationMembersController {
       );
     }
 
-    return this.organizationMembersService.findAll(options);
+    return this.organizationMembersService.findAndCount(options);
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])

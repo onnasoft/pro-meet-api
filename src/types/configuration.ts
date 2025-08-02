@@ -23,6 +23,14 @@ export interface Configuration {
     webhookSecret: string;
   };
 
+  s3: {
+    bucket: string;
+    region: string;
+    endpoint: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
+
   plans: {
     free: {
       id: string;

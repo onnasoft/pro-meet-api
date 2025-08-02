@@ -163,6 +163,27 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty({ message: 'PLAN_ENTERPRISE_ID is required' })
   PLAN_ENTERPRISE_ID: string;
+
+  // S3 Configuration
+  @IsString()
+  @IsNotEmpty({ message: 'S3_BUCKET_NAME is required' })
+  S3_BUCKET_NAME: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'S3_REGION is required' })
+  S3_REGION: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'S3_ENDPOINT is required' })
+  S3_ENDPOINT: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'S3_ACCESS_KEY_ID is required' })
+  S3_ACCESS_KEY_ID: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'S3_SECRET_ACCESS_KEY is required' })
+  S3_SECRET_ACCESS_KEY: string;
 }
 
 export function validate(config: Record<string, unknown>) {

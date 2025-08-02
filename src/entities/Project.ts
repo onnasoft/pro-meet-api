@@ -61,7 +61,7 @@ export class Project {
   @JoinColumn({ name: 'organization_id' })
   organization: Organization;
 
-  @Column({ name: 'organization_id' })
+  @Column({ name: 'organization_id', type: 'uuid' })
   organizationId: string;
 
   // Relación con el líder del proyecto

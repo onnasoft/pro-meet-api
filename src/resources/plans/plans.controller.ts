@@ -8,8 +8,8 @@ export class PlansController {
 
   @Public()
   @Get()
-  findAll() {
-    return this.plansService.findAll();
+  findAndCount() {
+    return this.plansService.findAndCount();
   }
 
   @Public()

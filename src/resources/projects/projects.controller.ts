@@ -34,8 +34,8 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  findAndCount() {
+    return this.projectsService.findAndCount();
   }
 
   @Get(':id')

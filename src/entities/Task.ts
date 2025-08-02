@@ -73,7 +73,7 @@ export class Task {
   @JoinColumn({ name: 'assignee_id' })
   assignee: User | null;
 
-  @Column({ name: 'assignee_id', nullable: true })
+  @Column({ name: 'assignee_id', type: 'uuid', nullable: true })
   assigneeId?: string | null;
 
   // Relación con etiquetas (tags)
