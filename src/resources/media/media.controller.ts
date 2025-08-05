@@ -31,6 +31,7 @@ import { OrganizationMembersService } from '../organization-members/organization
 import { MemberRole, MemberStatus } from '@/types/organization-member';
 import { In } from 'typeorm';
 import { I18nLang, I18nService } from 'nestjs-i18n';
+import { Response } from 'express';
 
 @Controller('media')
 export class MediaController {
@@ -86,12 +87,13 @@ export class MediaController {
   @Get('download/:filename')
   async download(
     @Request() req: Express.Request & { user: User },
-    @Res() res: any,
+    @Res() res: Response,
     @Param('filename') filename: string,
     @I18nLang() lang: string,
   ) {
     const media = await this.mediaService.findOne({
       where: { url: `/media/download/${filename}` },
+      select: ['id', 'filename', 'mimetype', 'organizationId'],
     });
     if (!media) {
       res.status(404).send('File not found');
@@ -123,7 +125,10 @@ export class MediaController {
 
     const stream = await this.s3Service.downloadFile(filename);
     res.setHeader('Content-Type', media.mimetype);
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${media.filename}"`,
+    );
     stream.pipe(res);
   }
 
