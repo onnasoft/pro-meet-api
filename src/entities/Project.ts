@@ -50,6 +50,15 @@ export class Project {
   @Column({ name: 'due_date', type: 'date', nullable: true })
   dueDate?: Date | null;
 
+  @Column({ nullable: true, type: 'varchar' })
+  website?: string | null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  location?: string | null;
+
+  @Column({ nullable: true, length: 20, type: 'varchar' })
+  phone?: string | null;
+
   @Column({ name: 'logo_url', nullable: true, type: 'varchar' })
   logoUrl?: string | null;
 

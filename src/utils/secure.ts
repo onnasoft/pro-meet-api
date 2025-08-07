@@ -2,7 +2,7 @@ import { SetMetadata } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 
-const saltRounds = 10; // Coste del procesamiento (10-12 es buen balance entre seguridad y rendimiento)
+const saltRounds = 10;
 
 export async function hashPassword(password: string): Promise<string> {
   const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -17,8 +17,8 @@ export async function comparePassword(
   return isMatch;
 }
 
-export function generateRandomToken(): string {
-  return randomBytes(32).toString('hex');
+export function generateRandomToken(length: number = 32): string {
+  return randomBytes(length).toString('hex');
 }
 
 export const IS_PUBLIC_KEY = 'isPublic';

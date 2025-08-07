@@ -140,8 +140,18 @@ export class OrganizationMembersController {
     if (req.user?.role === Role.Admin) {
       // Admins can see all members
     } else if (req.user?.id) {
+      const organizations = (
+        await this.organizationMembersService.find({
+          where: {
+            userId: req.user.id,
+            status: MemberStatus.ACTIVE,
+          },
+          select: ['organizationId'],
+        })
+      ).map((member) => member.organizationId);
+
       options.where ||= {};
-      options.where['email'] = req.user.email;
+      options.where['organizationId'] = In(organizations);
 
       const condition = { email: req.user.email || '', userId: IsNull() };
       await this.organizationMembersService.update(condition, {
@@ -159,7 +169,7 @@ export class OrganizationMembersController {
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Public()
   @Get(':id')
-  findOne(
+  async findOne(
     @Request() req: Express.Request & { user: User },
     @Param('id') id: string,
     @Query() query: QueryParams<OrganizationMember>,
@@ -167,7 +177,16 @@ export class OrganizationMembersController {
     const options = buildFindOneOptions(query);
     options.where = { id };
     if (req.user.role !== Role.Admin) {
-      options.where['email'] = req.user.email;
+      const organizations = (
+        await this.organizationMembersService.find({
+          where: {
+            userId: req.user.id,
+            status: MemberStatus.ACTIVE,
+          },
+          select: ['organizationId'],
+        })
+      ).map((member) => member.organizationId);
+      options.where['organizationId'] = In(organizations);
     }
 
     return this.organizationMembersService.findOne({

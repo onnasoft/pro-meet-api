@@ -7,7 +7,5 @@ export enum ProjectStatus {
 }
 
 export enum ProjectVisibility {
-  PRIVATE = 'private',
   TEAM = 'team',
-  PUBLIC = 'public',
 }

@@ -6,7 +6,6 @@ import { JwtAuthGuard } from './guards/jwt-auth-guard/jwt-auth-guard.guard';
 import * as bodyParser from 'body-parser';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 import * as cookieParser from 'cookie-parser';
-import { AllExceptionsFilter } from './filters/AllExceptionsFilter';
 
 async function bootstrap() {
   const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
@@ -28,7 +27,6 @@ async function bootstrap() {
 
   app.useGlobalPipes(new I18nValidationPipe());
   app.useGlobalFilters(new I18nValidationExceptionFilter());
-  app.useGlobalFilters(new AllExceptionsFilter());
 
   app.use(cookieParser());
 
