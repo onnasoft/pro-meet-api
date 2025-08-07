@@ -100,7 +100,7 @@ export class MediaController {
       return;
     }
 
-    if (req.user.role !== Role.Admin) {
+    if (req.user.role !== Role.Admin && media.organizationId) {
       const member = await this.organizationMembersService.findOne({
         where: {
           userId: req.user.id,

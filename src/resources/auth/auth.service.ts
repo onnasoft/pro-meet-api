@@ -554,7 +554,7 @@ export class AuthService {
         }),
       );
 
-      return this.login(newUser);
+      return this.login(newUser, true);
     }
 
     if (!user.isEmailVerified) {

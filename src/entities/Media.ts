@@ -32,12 +32,13 @@ export class Media {
 
   @ManyToOne(() => Organization, (organization) => organization.media, {
     onDelete: 'CASCADE',
+    nullable: true,
   })
   @JoinColumn({ name: 'organizationId' })
   organization: Organization;
 
-  @Column({ type: 'uuid' })
-  organizationId: string;
+  @Column({ type: 'uuid', nullable: true })
+  organizationId: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString, IsUUID, IsOptional } from 'class-validator';
+import { IsString, IsUUID, IsOptional } from 'class-validator';
 
 export class CreateMediaDto {
   @IsUUID()
-  @IsNotEmpty()
+  @IsOptional()
   organizationId: string;
 
   @IsOptional()

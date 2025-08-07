@@ -30,7 +30,7 @@ export class CreateOrganizationDto {
   phone?: string;
 
   @IsOptional()
-  @IsUrlOrEmpty()
+  @IsString()
   logoUrl?: string;
 
   @IsOptional()
