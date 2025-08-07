@@ -6,6 +6,7 @@ import { Organization } from '@/entities/Organization';
 import { OrganizationMembersModule } from '../organization-members/organization-members.module';
 import { StripeModule } from '../stripe/stripe.module';
 import { PlansModule } from '../plans/plans.module';
+import { ProjectsModule } from '../projects/projects.module';
 
 @Module({
   controllers: [OrganizationsController],
@@ -15,6 +16,7 @@ import { PlansModule } from '../plans/plans.module';
     forwardRef(() => OrganizationMembersModule),
     StripeModule,
     PlansModule,
+    forwardRef(() => ProjectsModule),
   ],
   exports: [OrganizationsService],
 })

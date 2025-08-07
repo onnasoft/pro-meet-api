@@ -10,6 +10,7 @@ import {
   Request,
   Query,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -29,6 +30,8 @@ import { StripeService } from '../stripe/stripe.service';
 import { I18nLang, I18nService } from 'nestjs-i18n';
 import { PlansService } from '../plans/plans.service';
 import { Language } from '@/utils/language';
+import { ProjectsService } from '../projects/projects.service';
+import { ProjectStatus } from '@/types/project';
 
 @Controller('organizations')
 export class OrganizationsController {
@@ -37,6 +40,7 @@ export class OrganizationsController {
     private readonly organizationMembersService: OrganizationMembersService,
     private readonly stripeService: StripeService,
     private readonly plansService: PlansService,
+    private readonly projectsService: ProjectsService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -161,7 +165,7 @@ export class OrganizationsController {
       });
 
       if (!organizationMember) {
-        throw new BadRequestException(
+        throw new UnauthorizedException(
           this.i18n.translate('organizations.member_not_found', { lang }),
         );
       }
@@ -191,5 +195,51 @@ export class OrganizationsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.organizationsService.remove(id);
+  }
+
+  @SetMetadata('roles', [Role.User, Role.Admin])
+  @Get(':id/status')
+  async status(
+    @Request() req: Express.Request & { user: User },
+    @Param('id') id: string,
+  ) {
+    const organizationMembers = await this.organizationMembersService.find({
+      where: { organizationId: id, userId: req.user.id },
+      select: ['role', 'status'],
+    });
+    if (organizationMembers.length === 0) {
+      throw new UnauthorizedException(
+        this.i18n.translate('organizations.member_not_found', {
+          lang: req.user.language || 'en',
+        }),
+      );
+    }
+
+    const projects = await this.projectsService.find({
+      select: ['id', 'status'],
+      where: {
+        organizationId: id,
+      },
+      take: 100000,
+    });
+
+    const planningProjects = projects.filter(
+      (project) => project.status === ProjectStatus.PLANNING,
+    );
+
+    const inProgressProjects = projects.filter(
+      (project) => project.status === ProjectStatus.IN_PROGRESS,
+    );
+
+    const completedProjects = projects.filter(
+      (project) => project.status === ProjectStatus.COMPLETED,
+    );
+
+    return {
+      projects: projects.length,
+      planning: planningProjects.length,
+      inProgress: inProgressProjects.length,
+      completed: completedProjects.length,
+    };
   }
 }

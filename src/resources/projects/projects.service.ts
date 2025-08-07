@@ -29,6 +29,10 @@ export class ProjectsService {
     });
   }
 
+  find(options?: FindManyOptions<Project>) {
+    return this.projectsRepository.find(options);
+  }
+
   findOne(options: FindOneOptions<Project>) {
     return this.projectsRepository.findOne(options);
   }

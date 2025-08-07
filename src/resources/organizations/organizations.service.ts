@@ -35,6 +35,10 @@ export class OrganizationsService {
     });
   }
 
+  find(options?: FindManyOptions<Organization>) {
+    return this.organizationRepository.find(options);
+  }
+
   findOne(options: FindOneOptions<Organization>) {
     return this.organizationRepository.findOne(options);
   }

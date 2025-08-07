@@ -9,6 +9,7 @@ import {
   Req,
   SetMetadata,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -22,6 +23,9 @@ import { OrganizationMembersService } from '../organization-members/organization
 import { MemberRole } from '@/types/organization-member';
 import { Request } from 'express';
 import { User } from '@/entities/User';
+import { buildFindManyOptions, QueryParams } from '@/utils/query';
+import { Project } from '@/entities/Project';
+import { In } from 'typeorm';
 
 @Controller('projects')
 export class ProjectsController {
@@ -94,9 +98,29 @@ export class ProjectsController {
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])
-  @Get()
-  findAndCount() {
-    return this.projectsService.findAndCount();
+  @Get('')
+  async findAndCount(
+    @Req() req: Express.Request & { user: User },
+    @Query() query: QueryParams<Project>,
+  ) {
+    const options = buildFindManyOptions<Project>(query);
+    if (req.user.role !== Role.Admin) {
+      const organizationMember = await this.organizationMembersService.find({
+        where: {
+          userId: req.user.id,
+        },
+        take: 100,
+      });
+      const organizationsId = organizationMember?.map(
+        (member) => member.organizationId,
+      );
+      if (organizationsId) {
+        options.where ||= {};
+        options.where['organizationId'] = In(organizationsId);
+      }
+    }
+
+    return this.projectsService.findAndCount(options);
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])
