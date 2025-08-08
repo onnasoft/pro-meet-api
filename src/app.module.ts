@@ -42,6 +42,7 @@ import { PlansModule } from './resources/plans/plans.module';
 import { Media } from './entities/Media';
 import { MediaModule } from './resources/media/media.module';
 import { S3Module } from './services/s3/s3.module';
+import { JobsModule } from './resources/jobs/jobs.module';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -121,6 +122,7 @@ const isProd = process.env.NODE_ENV === 'production';
     PlansModule,
     MediaModule,
     S3Module,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService, CustomLangResolver],

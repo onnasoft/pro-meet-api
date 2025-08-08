@@ -177,8 +177,6 @@ export function buildFindManyOptions<
   options.where = baseOptions.where;
   options.relations = baseOptions.relations;
 
-  console.log('Query Params:', query);
-
   if (query.order) {
     const order: FindOptionsOrder<T> = {};
     const parts = query.order as string[];
