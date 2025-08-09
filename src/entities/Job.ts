@@ -1,4 +1,4 @@
-import { ContractType, JobStatus, JobType } from '@/types/job';
+import { ContractType, EducationLevel, JobStatus, JobType } from '@/types/job';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -63,7 +63,7 @@ export class Job {
   experienceRequired?: string;
 
   @Column({ nullable: true })
-  educationLevel?: string;
+  educationLevel?: EducationLevel;
 
   @Column({ nullable: true })
   skillsRequired?: string;

@@ -32,6 +32,7 @@ import { PlansService } from '../plans/plans.service';
 import { Language } from '@/utils/language';
 import { ProjectsService } from '../projects/projects.service';
 import { ProjectStatus } from '@/types/project';
+import { In } from 'typeorm';
 
 @Controller('organizations')
 export class OrganizationsController {
@@ -111,12 +112,30 @@ export class OrganizationsController {
   async findAndCount(
     @Request() req: Express.Request & { user: User },
     @Query() query: QueryParams<Organization>,
+    @I18nLang() lang: Language = 'en',
   ) {
     const options = buildFindManyOptions<Organization>(query);
     if (req.user.role !== Role.Admin) {
       options.where ||= {};
-      options.where['members'] ||= {};
-      options.where['members']['userId'] = req.user.id;
+
+      const organizationMember = await this.organizationMembersService.find({
+        where: {
+          userId: req.user.id,
+          status: MemberStatus.ACTIVE,
+        },
+        select: ['organizationId'],
+        cache: 1000,
+      });
+
+      if (!organizationMember) {
+        throw new UnauthorizedException(
+          this.i18n.translate('organizations.not_authorized', { lang }),
+        );
+      }
+
+      options.where['id'] = In(
+        organizationMember.map((member) => member.organizationId),
+      );
     }
 
     return this.organizationsService.findAndCount(options);
@@ -124,12 +143,33 @@ export class OrganizationsController {
 
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get(':id')
-  findOne(@Param('id') id: string, @Query() query: QueryParams<Organization>) {
+  async findOne(
+    @Request() req: Express.Request & { user: User },
+    @Param('id') id: string,
+    @Query() query: QueryParams<Organization>,
+    @I18nLang() lang: Language = 'en',
+  ) {
     const options = buildFindOneOptions<Organization>(query);
-    options.where = {
-      id,
-      ...(options.where || {}),
-    };
+    options.where ||= {};
+    options.where['id'] = id;
+
+    if (req.user.role !== Role.Admin) {
+      const organizationMember = await this.organizationMembersService.findOne({
+        where: {
+          userId: req.user.id,
+          organizationId: id,
+          status: MemberStatus.ACTIVE,
+        },
+        select: ['organizationId'],
+        cache: 1000,
+      });
+
+      if (!organizationMember) {
+        throw new UnauthorizedException(
+          this.i18n.translate('organizations.not_authorized', { lang }),
+        );
+      }
+    }
 
     return this.organizationsService.findOne({
       ...options,

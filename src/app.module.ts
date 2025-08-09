@@ -43,6 +43,7 @@ import { Media } from './entities/Media';
 import { MediaModule } from './resources/media/media.module';
 import { S3Module } from './services/s3/s3.module';
 import { JobsModule } from './resources/jobs/jobs.module';
+import { Job } from './entities/Job';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -74,6 +75,7 @@ const isProd = process.env.NODE_ENV === 'production';
             Plan,
             PlanTranslation,
             Media,
+            Job,
           ],
           synchronize: true,
         } as TypeOrmModuleOptions;

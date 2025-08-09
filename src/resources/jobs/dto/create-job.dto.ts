@@ -1,4 +1,4 @@
-import { ContractType, JobStatus, JobType } from '@/types/job';
+import { ContractType, EducationLevel, JobStatus, JobType } from '@/types/job';
 import {
   IsEnum,
   IsOptional,
@@ -58,8 +58,8 @@ export class CreateJobDto {
   experienceRequired?: string;
 
   @IsOptional()
-  @IsString()
-  educationLevel?: string;
+  @IsEnum(EducationLevel)
+  educationLevel?: EducationLevel;
 
   @IsOptional()
   @IsString()

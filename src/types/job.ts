@@ -18,3 +18,12 @@ export enum ContractType {
   FREELANCE = 'freelance',
   INTERN = 'intern',
 }
+
+export enum EducationLevel {
+  NONE = 'NONE',
+  HIGH_SCHOOL = 'HIGH_SCHOOL',
+  ASSOCIATE = 'ASSOCIATE',
+  BACHELOR = 'BACHELOR',
+  MASTER = 'MASTER',
+  DOCTORATE = 'DOCTORATE',
+}

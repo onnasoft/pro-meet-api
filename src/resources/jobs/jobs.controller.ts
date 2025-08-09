@@ -114,12 +114,36 @@ export class JobsController {
 
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get(':id')
-  findOne(@Param('id') id: string, @Query() query: QueryParams<Job>) {
+  async findOne(
+    @Request() req: Express.Request & { user: User },
+    @Param('id') id: string,
+    @Query() query: QueryParams<Job>,
+    @I18nLang() lang: Language = 'en',
+  ) {
     const options = buildFindOneOptions<Job>(query);
-    options.where = {
-      id,
-      ...(options.where || {}),
-    };
+    options.where ||= {};
+    options.where['id'] = id;
+
+    if (req.user.role !== Role.Admin) {
+      const organizationMember = await this.organizationMembersService.find({
+        where: {
+          userId: req.user.id,
+          status: MemberStatus.ACTIVE,
+          role: In([MemberRole.OWNER, MemberRole.ADMIN, MemberRole.MEMBER]),
+        },
+        select: ['organizationId'],
+      });
+
+      if (!organizationMember) {
+        throw new UnauthorizedException(
+          this.i18n.translate('jobs.not_authorized_to_create_job', { lang }),
+        );
+      }
+
+      options.where['organizationId'] = In(
+        organizationMember.map((member) => member.organizationId),
+      );
+    }
 
     return this.jobsService.findOne({
       ...options,
