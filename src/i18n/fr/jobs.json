@@ -1,0 +1,5 @@
+{
+  "not_authorized_to_create_job": "Vous n'êtes pas autorisé à créer un emploi dans cette organisation.",
+  "job_not_found": "Emploi non trouvé.",
+  "not_authorized_to_update_job": "Vous n'êtes pas autorisé à mettre à jour cet emploi."
+}

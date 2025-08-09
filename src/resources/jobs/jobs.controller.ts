@@ -1,34 +1,203 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  SetMetadata,
+  Request,
+  Query,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
+import { Role } from '@/types/role';
+import { User } from '@/entities/User';
+import {
+  buildFindManyOptions,
+  buildFindOneOptions,
+  QueryParams,
+} from '@/utils/query';
+import { Job } from '@/entities/Job';
+import { Language } from '@/utils/language';
+import { I18nLang, I18nService } from 'nestjs-i18n';
+import { OrganizationMembersService } from '../organization-members/organization-members.service';
+import { JobStatus } from '@/types/job';
+import { In } from 'typeorm';
+import { MemberRole, MemberStatus } from '@/types/organization-member';
 
 @Controller('jobs')
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) {}
+  constructor(
+    private readonly organizationMembersService: OrganizationMembersService,
+    private readonly jobsService: JobsService,
+    private readonly i18n: I18nService,
+  ) {}
 
   @Post()
-  create(@Body() createJobDto: CreateJobDto) {
-    return this.jobsService.create(createJobDto);
+  async create(
+    @Request() req: Express.Request & { user: User },
+    @Body() payload: CreateJobDto,
+    @I18nLang() lang: Language = 'en',
+  ) {
+    if (req.user.role !== Role.Admin) {
+      const organizationMember = await this.organizationMembersService.findOne({
+        where: {
+          userId: req.user.id,
+          organizationId: payload.organizationId,
+          status: MemberStatus.ACTIVE,
+          role: In([MemberRole.OWNER, MemberRole.ADMIN, MemberRole.MEMBER]),
+        },
+        select: ['id'],
+      });
+
+      if (!organizationMember) {
+        throw new UnauthorizedException(
+          this.i18n.translate('jobs.not_authorized_to_create_job', { lang }),
+        );
+      }
+    }
+
+    return this.jobsService.create({
+      title: payload.title,
+      description: payload.description,
+      status: payload.status ?? JobStatus.OPEN,
+      contractType: payload.contractType,
+      jobType: payload.jobType,
+      salaryMin: payload.salaryMin,
+      salaryMax: payload.salaryMax,
+      location: payload.location,
+      postedAt: payload.postedAt,
+      isActive: payload.isActive,
+      recruiterFee: payload.recruiterFee,
+      experienceRequired: payload.experienceRequired,
+      organizationId: payload.organizationId,
+    });
   }
 
-  @Get()
-  findAll() {
-    return this.jobsService.findAll();
+  @SetMetadata('roles', [Role.User, Role.Admin])
+  @Get('')
+  async findAndCount(
+    @Request() req: Express.Request & { user: User },
+    @Query() query: QueryParams<Job>,
+    @I18nLang() lang: Language = 'en',
+  ) {
+    const options = buildFindManyOptions<Job>(query);
+    if (req.user.role !== Role.Admin) {
+      options.where ||= {};
+      const organizationMember = await this.organizationMembersService.find({
+        where: {
+          userId: req.user.id,
+          status: MemberStatus.ACTIVE,
+          role: In([MemberRole.OWNER, MemberRole.ADMIN, MemberRole.MEMBER]),
+        },
+        select: ['organizationId'],
+      });
+
+      if (!organizationMember) {
+        throw new UnauthorizedException(
+          this.i18n.translate('jobs.not_authorized_to_create_job', { lang }),
+        );
+      }
+
+      options.where['organizationId'] = In(
+        organizationMember.map((member) => member.organizationId),
+      );
+    }
+
+    return this.jobsService.findAndCount(options);
   }
 
+  @SetMetadata('roles', [Role.User, Role.Admin])
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.jobsService.findOne(+id);
+  findOne(@Param('id') id: string, @Query() query: QueryParams<Job>) {
+    const options = buildFindOneOptions<Job>(query);
+    options.where = {
+      id,
+      ...(options.where || {}),
+    };
+
+    return this.jobsService.findOne({
+      ...options,
+    });
   }
 
+  @SetMetadata('roles', [Role.User, Role.Admin])
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateJobDto: UpdateJobDto) {
-    return this.jobsService.update(+id, updateJobDto);
+  async update(
+    @Request() req: Express.Request & { user: User },
+    @Param('id') id: string,
+    @Body() payload: UpdateJobDto,
+    @I18nLang() lang: Language = 'en',
+  ) {
+    if (req.user.role !== Role.Admin) {
+      const job = await this.jobsService.findOne({ where: { id } });
+
+      if (!job) {
+        throw new BadRequestException(
+          this.i18n.translate('jobs.job_not_found', { lang }),
+        );
+      }
+
+      const organizationMember = await this.organizationMembersService.findOne({
+        where: {
+          userId: req.user.id,
+          organizationId: job.organizationId,
+          status: MemberStatus.ACTIVE,
+          role: In([MemberRole.OWNER, MemberRole.ADMIN, MemberRole.MEMBER]),
+        },
+        select: ['id'],
+      });
+
+      if (!organizationMember) {
+        throw new UnauthorizedException(
+          this.i18n.translate('jobs.not_authorized_to_update_job', { lang }),
+        );
+      }
+    }
+
+    return this.jobsService.update(id, payload);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.jobsService.remove(+id);
+  async remove(
+    @Request() req: Express.Request & { user: User },
+    @Param('id') id: string,
+    @I18nLang() lang: Language = 'en',
+  ) {
+    if (req.user.role !== Role.Admin) {
+      const job = await this.jobsService.findOne({
+        where: { id },
+        select: ['id', 'organizationId'],
+      });
+
+      if (!job) {
+        throw new BadRequestException(
+          this.i18n.translate('jobs.job_not_found', { lang }),
+        );
+      }
+
+      const organizationMember = await this.organizationMembersService.findOne({
+        where: {
+          userId: req.user.id,
+          organizationId: job.organizationId,
+          status: MemberStatus.ACTIVE,
+          role: In([MemberRole.OWNER, MemberRole.ADMIN, MemberRole.MEMBER]),
+        },
+        select: ['id'],
+      });
+
+      if (!organizationMember) {
+        throw new UnauthorizedException(
+          this.i18n.translate('jobs.not_authorized_to_create_job', { lang }),
+        );
+      }
+    }
+
+    return this.jobsService.remove(id);
   }
 }

@@ -1,0 +1,5 @@
+{
+  "not_authorized_to_create_job": "您没有权限在此组织中创建职位。",
+  "job_not_found": "职位未找到。",
+  "not_authorized_to_update_job": "您没有权限更新此职位。"
+}

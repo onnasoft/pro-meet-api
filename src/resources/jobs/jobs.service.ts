@@ -1,26 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import { CreateJobDto } from './dto/create-job.dto';
-import { UpdateJobDto } from './dto/update-job.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Job } from '@/entities/Job';
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
+import { Create, Update } from '@/types/models';
+import { pagination } from '@/utils/pagination';
 
 @Injectable()
 export class JobsService {
-  create(createJobDto: CreateJobDto) {
-    return 'This action adds a new job';
+  constructor(
+    @InjectRepository(Job)
+    private readonly jobsRepository: Repository<Job>,
+  ) {}
+
+  create(payload: Create<Job>) {
+    const job = this.jobsRepository.create(payload);
+    return this.jobsRepository.save(job);
   }
 
-  findAll() {
-    return `This action returns all jobs`;
+  async findAndCount(options?: FindManyOptions<Job>) {
+    const [jobs, count] = await this.jobsRepository.findAndCount(options);
+
+    return pagination({
+      data: jobs,
+      count,
+      skip: options?.skip,
+      take: options?.take || 10,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} job`;
+  find(options?: FindManyOptions<Job>) {
+    return this.jobsRepository.find(options);
   }
 
-  update(id: number, updateJobDto: UpdateJobDto) {
-    return `This action updates a #${id} job`;
+  findOne(options: FindOneOptions<Job>) {
+    return this.jobsRepository.findOne(options);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} job`;
+  update(
+    options: FindOptionsWhere<Job>,
+    payload: Update<Job>,
+  ): Promise<UpdateResult>;
+  update(id: string, payload: Update<Job>): Promise<Job | null>;
+  update(options: any, payload: Update<Job>) {
+    if (typeof options === 'string') {
+      return this.jobsRepository.update(options, payload).then(() => {
+        return this.findOne({ where: { id: options } });
+      });
+    }
+
+    return this.jobsRepository.update(options, payload);
+  }
+
+  remove(id: string) {
+    return this.jobsRepository.delete(id);
   }
 }
