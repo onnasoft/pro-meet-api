@@ -15,6 +15,7 @@ import { Organization } from './Organization';
 import { User } from './User';
 import { Task } from './Task';
 import { ProjectStatus, ProjectVisibility } from '@/types/project';
+import { Job } from './Job';
 
 @Entity('projects')
 export class Project {
@@ -95,6 +96,9 @@ export class Project {
     },
   })
   members: User[];
+
+  @OneToMany(() => Job, (job) => job.project)
+  jobs: Job[];
 
   // Relación con tareas
   @OneToMany(() => Task, (task) => task.project)

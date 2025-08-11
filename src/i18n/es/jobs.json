@@ -1,5 +1,6 @@
 {
   "not_authorized_to_create_job": "No estás autorizado para crear un trabajo en esta organización.",
   "job_not_found": "Trabajo no encontrado.",
-  "not_authorized_to_update_job": "No estás autorizado para actualizar este trabajo."
+  "not_authorized_to_update_job": "No estás autorizado para actualizar este trabajo.",
+  "project_not_found": "Proyecto no encontrado."
 }

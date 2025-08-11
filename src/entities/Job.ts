@@ -10,8 +10,11 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Organization } from './Organization';
+import { Project } from './Project';
 
-@Entity()
+@Entity({
+  name: 'jobs',
+})
 export class Job {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -33,7 +36,7 @@ export class Job {
     type: 'enum',
     enum: JobType,
   })
-  jobType: JobType;
+  type: JobType;
 
   @Column({
     type: 'enum',
@@ -67,6 +70,13 @@ export class Job {
 
   @Column({ nullable: true })
   skillsRequired?: string;
+
+  @ManyToOne(() => Project, (project) => project.jobs)
+  @JoinColumn({ name: 'project_id' })
+  project: Project;
+
+  @Column({ name: 'project_id', type: 'uuid' })
+  projectId: string;
 
   @ManyToOne(() => Organization)
   @JoinColumn({ name: 'organization_id' })

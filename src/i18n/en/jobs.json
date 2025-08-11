@@ -1,5 +1,6 @@
 {
   "not_authorized_to_create_job": "You are not authorized to create a job in this organization.",
   "job_not_found": "Job not found.",
-  "not_authorized_to_update_job": "You are not authorized to update this job."
+  "not_authorized_to_update_job": "You are not authorized to update this job.",
+  "project_not_found": "Project not found."
 }

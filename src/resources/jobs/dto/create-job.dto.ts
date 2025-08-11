@@ -24,7 +24,7 @@ export class CreateJobDto {
   status?: JobStatus;
 
   @IsEnum(JobType)
-  jobType: JobType;
+  type: JobType;
 
   @IsEnum(ContractType)
   contractType: ContractType;
@@ -67,4 +67,7 @@ export class CreateJobDto {
 
   @IsUUID()
   organizationId: string;
+
+  @IsUUID()
+  projectId: string;
 }

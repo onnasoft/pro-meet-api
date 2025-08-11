@@ -4,10 +4,15 @@ import { JobsController } from './jobs.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Job } from '@/entities/Job';
 import { OrganizationMembersModule } from '../organization-members/organization-members.module';
+import { ProjectsModule } from '../projects/projects.module';
 
 @Module({
   controllers: [JobsController],
   providers: [JobsService],
-  imports: [TypeOrmModule.forFeature([Job]), OrganizationMembersModule],
+  imports: [
+    TypeOrmModule.forFeature([Job]),
+    ProjectsModule,
+    OrganizationMembersModule,
+  ],
 })
 export class JobsModule {}

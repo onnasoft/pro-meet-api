@@ -29,11 +29,13 @@ import { OrganizationMembersService } from '../organization-members/organization
 import { JobStatus } from '@/types/job';
 import { In } from 'typeorm';
 import { MemberRole, MemberStatus } from '@/types/organization-member';
+import { ProjectsService } from '../projects/projects.service';
 
 @Controller('jobs')
 export class JobsController {
   constructor(
     private readonly organizationMembersService: OrganizationMembersService,
+    private readonly projectsService: ProjectsService,
     private readonly jobsService: JobsService,
     private readonly i18n: I18nService,
   ) {}
@@ -60,6 +62,20 @@ export class JobsController {
           this.i18n.translate('jobs.not_authorized_to_create_job', { lang }),
         );
       }
+
+      const project = await this.projectsService.findOne({
+        where: {
+          id: payload.projectId,
+          organizationId: payload.organizationId,
+        },
+        select: ['id'],
+      });
+
+      if (!project) {
+        throw new BadRequestException(
+          this.i18n.translate('jobs.project_not_found', { lang }),
+        );
+      }
     }
 
     return this.jobsService.create({
@@ -67,7 +83,7 @@ export class JobsController {
       description: payload.description,
       status: payload.status ?? JobStatus.OPEN,
       contractType: payload.contractType,
-      jobType: payload.jobType,
+      type: payload.type,
       salaryMin: payload.salaryMin,
       salaryMax: payload.salaryMax,
       location: payload.location,
@@ -76,6 +92,7 @@ export class JobsController {
       recruiterFee: payload.recruiterFee,
       experienceRequired: payload.experienceRequired,
       organizationId: payload.organizationId,
+      projectId: payload.projectId,
     });
   }
 
@@ -159,7 +176,10 @@ export class JobsController {
     @I18nLang() lang: Language = 'en',
   ) {
     if (req.user.role !== Role.Admin) {
-      const job = await this.jobsService.findOne({ where: { id } });
+      const job = await this.jobsService.findOne({
+        where: { id },
+        select: ['id', 'organizationId', 'projectId'],
+      });
 
       if (!job) {
         throw new BadRequestException(
@@ -181,6 +201,22 @@ export class JobsController {
         throw new UnauthorizedException(
           this.i18n.translate('jobs.not_authorized_to_update_job', { lang }),
         );
+      }
+
+      if (payload.projectId && payload.projectId !== job.projectId) {
+        const project = await this.projectsService.findOne({
+          where: {
+            id: payload.projectId,
+            organizationId: job.organizationId,
+          },
+          select: ['id'],
+        });
+
+        if (!project) {
+          throw new BadRequestException(
+            this.i18n.translate('jobs.project_not_found', { lang }),
+          );
+        }
       }
     }
 
