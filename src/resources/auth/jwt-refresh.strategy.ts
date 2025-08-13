@@ -7,7 +7,10 @@ import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(configService: ConfigService) {
     const config = configService.get('config') as Configuration;
     if (!config) {
@@ -28,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JWTPayload) {
-    if (payload.refresh) {
+    if (!payload.refresh) {
       return false;
     }
     return {

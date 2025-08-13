@@ -21,6 +21,7 @@ export interface JWTPayload {
   email: string;
   role: Role;
   rememberMe?: boolean;
+  refresh?: boolean;
   iat?: number;
   exp?: number;
 }

@@ -486,9 +486,12 @@ export class AuthService {
       expiresIn: rememberMe ? '30d' : '1h',
     });
 
-    const refresh_token = this.jwtService.sign(payload, {
-      expiresIn: rememberMe ? '90d' : '30d',
-    });
+    const refresh_token = this.jwtService.sign(
+      { ...payload, refresh: true },
+      {
+        expiresIn: rememberMe ? '90d' : '30d',
+      },
+    );
 
     return { access_token, refresh_token };
   }

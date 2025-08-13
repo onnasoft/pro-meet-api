@@ -2,12 +2,13 @@ import {
   Controller,
   Post,
   Body,
-  HttpStatus,
   UseGuards,
-  Request,
   Get,
+  Req,
+  HttpStatus,
   SetMetadata,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -15,11 +16,13 @@ import { User } from '@/entities/User';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { ForgotPasswordAuthDto } from './dto/forgot-password-auth.dto';
 import { Public } from '@/utils/secure';
-import { Role } from '@/types/role';
 import { I18nLang } from 'nestjs-i18n';
 import { ResendVerificationAuthDto } from './dto/resend-verification-auth.dto';
 import { OAuthAuthDto } from './dto/oauth-auth.dto';
 import { Language } from '@/utils/language';
+import { Role } from '@/types/role';
+import { jwtDecode } from 'jwt-decode';
+import { JWTPayload } from '@/types/jwt';
 
 @Controller('auth')
 export class AuthController {
@@ -38,17 +41,22 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('/login')
   async login(
-    @Request() req: Express.Request & { user: User },
+    @Req() req: Request & { user: User },
     @Body() payload: LoginAuthDto,
   ) {
     return this.authService.login(req.user, payload.rememberMe);
   }
 
   @Public()
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/refresh')
-  refresh(@Request() req: Express.Request & { user: User }) {
-    return this.authService.refreshToken(req.user);
+  @UseGuards(AuthGuard('jwt-refresh'))
+  @Get('/refresh-token')
+  refresh(@Req() req: Request & { user: User }) {
+    const rawToken =
+      (req.headers as any)?.authorization?.replace('Bearer ', '') || '';
+
+    const decoded = jwtDecode(rawToken) as JWTPayload;
+
+    return this.authService.refreshToken(req.user, decoded.rememberMe);
   }
 
   @Public()
@@ -117,7 +125,7 @@ export class AuthController {
 
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get('/session')
-  async me(@Request() req: Express.Request & { user: User }) {
+  async me(@Req() req: Request & { user: User }) {
     return this.authService.session(req.user);
   }
 }

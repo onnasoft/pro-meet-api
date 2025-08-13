@@ -7,6 +7,7 @@ import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { EmailModule } from '@/services/email/email.module';
+import { JwtRefreshStrategy } from './jwt-refresh.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -16,6 +17,6 @@ import { EmailModule } from '@/services/email/email.module';
     NotificationsModule,
     PassportModule.register({ defaultStrategy: 'local' }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
 })
 export class AuthModule {}

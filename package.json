@@ -39,6 +39,7 @@
     "dotenv": "^17.2.1",
     "handlebars": "^4.7.8",
     "jwk-to-pem": "^2.0.7",
+    "jwt-decode": "^4.0.0",
     "moment-timezone": "^0.6.0",
     "multer": "^2.0.2",
     "nestjs-i18n": "^10.5.1",
