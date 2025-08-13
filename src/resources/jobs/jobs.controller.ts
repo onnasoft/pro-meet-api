@@ -91,6 +91,9 @@ export class JobsController {
       isActive: payload.isActive,
       recruiterFee: payload.recruiterFee,
       experienceRequired: payload.experienceRequired,
+      skillsRequired: payload.skillsRequired,
+      benefits: payload.benefits,
+      educationLevel: payload.educationLevel,
       organizationId: payload.organizationId,
       projectId: payload.projectId,
     });

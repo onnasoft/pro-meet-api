@@ -65,6 +65,10 @@ export class CreateJobDto {
   @IsString()
   skillsRequired?: string;
 
+  @IsOptional()
+  @IsString()
+  benefits?: string;
+
   @IsUUID()
   organizationId: string;
 

@@ -184,6 +184,10 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty({ message: 'S3_SECRET_ACCESS_KEY is required' })
   S3_SECRET_ACCESS_KEY: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'STRIPE_PRODUCT_ID is required' })
+  STRIPE_PRODUCT_ID: string;
 }
 
 export function validate(config: Record<string, unknown>) {

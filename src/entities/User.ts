@@ -7,8 +7,11 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Organization } from './Organization';
+import { Plan } from './Plan';
 
 @Entity('users')
 export class User {
@@ -69,6 +72,48 @@ export class User {
 
   @Column({ nullable: true, type: 'varchar' })
   defaultPaymentMethodId?: string;
+
+  @Column({ nullable: true, type: 'varchar', select: false })
+  planId: string;
+
+  @OneToOne(() => Plan, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  @JoinColumn({ name: 'planId' })
+  plan?: Plan;
+
+  @Column({ type: 'timestamp', nullable: true })
+  planStartDate: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  planEndDate: Date | null;
+
+  @Column({
+    type: 'enum',
+    enum: [
+      'active',
+      'canceled',
+      'past_due',
+      'unpaid',
+      'incomplete',
+      'incomplete_expired',
+      'trialing',
+      'paused',
+    ],
+    default: 'active',
+    select: true,
+    comment: "The status of the user's subscription plan",
+  })
+  planStatus:
+    | 'active'
+    | 'canceled'
+    | 'past_due'
+    | 'unpaid'
+    | 'incomplete'
+    | 'incomplete_expired'
+    | 'trialing'
+    | 'paused';
+
+  @Column({ nullable: true, type: 'varchar', select: false })
+  stripeSubscriptionId: string | null;
 
   @Column({ default: false })
   newsletter?: boolean;

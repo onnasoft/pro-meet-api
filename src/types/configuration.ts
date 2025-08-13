@@ -21,6 +21,7 @@ export interface Configuration {
   stripe: {
     secretKey: string;
     webhookSecret: string;
+    productId: string;
   };
 
   s3: {

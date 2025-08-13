@@ -71,6 +71,9 @@ export class Job {
   @Column({ nullable: true })
   skillsRequired?: string;
 
+  @Column({ nullable: true })
+  benefits?: string;
+
   @ManyToOne(() => Project, (project) => project.jobs)
   @JoinColumn({ name: 'project_id' })
   project: Project;
