@@ -20,8 +20,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req: Request) => req?.cookies?.accessToken || null,
         ExtractJwt.fromAuthHeaderAsBearerToken(),
+        (req: Request) => req?.cookies?.accessToken || null,
       ]),
       secretOrKey: jwtSecret,
     });

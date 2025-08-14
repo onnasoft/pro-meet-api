@@ -497,15 +497,7 @@ export class AuthService {
   }
 
   refreshToken(user: User, rememberMe: boolean = false) {
-    const payload = { email: user.email, sub: user.id, role: Role.User };
-
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: rememberMe ? '30d' : '1h',
-    });
-
-    return {
-      access_token: accessToken,
-    };
+    return this.login(user, rememberMe);
   }
 
   async verifyToken(token: string) {

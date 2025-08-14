@@ -51,10 +51,8 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt-refresh'))
   @Get('/refresh-token')
   refresh(@Req() req: Request & { user: User }) {
-    const rawToken =
-      (req.headers as any)?.authorization?.replace('Bearer ', '') || '';
-
-    const decoded = jwtDecode(rawToken) as JWTPayload;
+    const rawToken = req.headers.authorization?.replace('Bearer ', '') ?? '';
+    const decoded = jwtDecode<JWTPayload>(rawToken);
 
     return this.authService.refreshToken(req.user, decoded.rememberMe);
   }
