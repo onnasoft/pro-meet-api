@@ -110,7 +110,7 @@ export class SeedService implements OnApplicationBootstrap {
         plan: freePlanMonth,
       },
       {
-        id: '2ced5fc9-6279-494e-8437-978dcdc153b3',
+        id: '59a07dce-482a-4b57-bce6-2ac3de9d874c',
         locale: 'zh',
         description: '适合个人和小团队',
         features: ['1 用户', '5 次采访/月', '基本录音（最多 40 分钟）'],
