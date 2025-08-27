@@ -567,7 +567,7 @@ export class AuthService {
     try {
       const decoded: OauthIdTokenPayload = await this.verifyToken(token);
 
-      if (!decoded || !decoded.email) {
+      if (!decoded.email) {
         throw new UnauthorizedException('Invalid Google token payload');
       }
 

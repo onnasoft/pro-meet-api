@@ -30,6 +30,7 @@ import { JobStatus } from '@/types/job';
 import { In } from 'typeorm';
 import { MemberRole, MemberStatus } from '@/types/organization-member';
 import { ProjectsService } from '../projects/projects.service';
+import { Public } from '@/utils/secure';
 
 @Controller('jobs')
 export class JobsController {
@@ -132,38 +133,13 @@ export class JobsController {
     return this.jobsService.findAndCount(options);
   }
 
+  @Public()
   @SetMetadata('roles', [Role.User, Role.Admin])
   @Get(':id')
-  async findOne(
-    @Request() req: Express.Request & { user: User },
-    @Param('id') id: string,
-    @Query() query: QueryParams<Job>,
-    @I18nLang() lang: Language = 'en',
-  ) {
+  async findOne(@Param('id') id: string, @Query() query: QueryParams<Job>) {
     const options = buildFindOneOptions<Job>(query);
     options.where ||= {};
     options.where['id'] = id;
-
-    if (req.user.role !== Role.Admin) {
-      const organizationMember = await this.organizationMembersService.find({
-        where: {
-          userId: req.user.id,
-          status: MemberStatus.ACTIVE,
-          role: In([MemberRole.OWNER, MemberRole.ADMIN, MemberRole.MEMBER]),
-        },
-        select: ['organizationId'],
-      });
-
-      if (!organizationMember) {
-        throw new UnauthorizedException(
-          this.i18n.translate('jobs.not_authorized_to_create_job', { lang }),
-        );
-      }
-
-      options.where['organizationId'] = In(
-        organizationMember.map((member) => member.organizationId),
-      );
-    }
 
     return this.jobsService.findOne({
       ...options,
