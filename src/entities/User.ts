@@ -12,6 +12,10 @@ import {
 } from 'typeorm';
 import { Organization } from './Organization';
 import { Plan } from './Plan';
+import { Post } from './Post';
+import { PostLike } from './PostLike';
+import { PostComment } from './PostComment';
+import { PostShare } from './PostShare';
 
 @Entity('users')
 export class User {
@@ -62,10 +66,25 @@ export class User {
   @Column({ type: 'varchar', length: 100, default: 'UTC' })
   timezone: string;
 
+  @Column({ nullable: true, type: 'varchar' })
+  avatarUrl: string;
+
   @OneToMany(() => Organization, (organization) => organization.owner, {
     cascade: true,
   })
   organizations: Organization[];
+
+  @OneToMany(() => Post, (post) => post.user, { cascade: true })
+  posts: Post[];
+
+  @OneToMany(() => PostLike, (like) => like.user)
+  postLikes: PostLike[];
+
+  @OneToMany(() => PostComment, (comment) => comment.user)
+  postComments: PostComment[];
+
+  @OneToMany(() => PostShare, (share) => share.user)
+  postShares: PostShare[];
 
   @Column({ nullable: true, type: 'varchar' })
   stripeCustomerId?: string;

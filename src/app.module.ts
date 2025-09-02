@@ -44,6 +44,11 @@ import { MediaModule } from './resources/media/media.module';
 import { S3Module } from './services/s3/s3.module';
 import { JobsModule } from './resources/jobs/jobs.module';
 import { Job } from './entities/Job';
+import { Post } from './entities/Post';
+import { PostsModule } from './resources/posts/posts.module';
+import { PostLike } from './entities/PostLike';
+import { PostComment } from './entities/PostComment';
+import { PostShare } from './entities/PostShare';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -76,6 +81,10 @@ const isProd = process.env.NODE_ENV === 'production';
             PlanTranslation,
             Media,
             Job,
+            Post,
+            PostLike,
+            PostComment,
+            PostShare,
           ],
           synchronize: true,
         } as TypeOrmModuleOptions;
@@ -125,6 +134,7 @@ const isProd = process.env.NODE_ENV === 'production';
     MediaModule,
     S3Module,
     JobsModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService, CustomLangResolver],
