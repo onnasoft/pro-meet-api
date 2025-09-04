@@ -24,9 +24,6 @@ export class Post {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  imageUrl?: string;
-
   @Column({ type: 'int', default: 0 })
   likesCount: number;
 
@@ -38,9 +35,6 @@ export class Post {
 
   @CreateDateColumn()
   timestamp: Date;
-
-  @Column({ type: 'boolean', default: false })
-  liked: boolean;
 
   @OneToMany(() => PostLike, (like) => like.post)
   likes: PostLike[];

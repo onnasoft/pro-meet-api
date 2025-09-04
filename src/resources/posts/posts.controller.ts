@@ -31,9 +31,7 @@ export class PostsController {
   create(@Body() payload: CreatePostDto) {
     return this.postsService.create({
       content: payload.content,
-      imageUrl: payload.imageUrl,
       commentsCount: 0,
-      liked: false,
       likesCount: 0,
       sharesCount: 0,
       timestamp: new Date(),
