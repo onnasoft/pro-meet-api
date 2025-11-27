@@ -36,7 +36,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly i18n: I18nService,
-  ) {}
+  ) { }
 
   async session(user: User) {
     return this.usersService.findOne({
