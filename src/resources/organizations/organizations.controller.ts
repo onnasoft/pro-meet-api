@@ -29,7 +29,7 @@ import { MemberRole, MemberStatus } from '@/types/organization-member';
 import { StripeService } from '../stripe/stripe.service';
 import { I18nLang, I18nService } from 'nestjs-i18n';
 import { PlansService } from '../plans/plans.service';
-import { Language } from '@/utils/language';
+import type { Language } from '@/utils/language';
 import { ProjectsService } from '../projects/projects.service';
 import { ProjectStatus } from '@/types/project';
 import { In } from 'typeorm';

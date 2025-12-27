@@ -23,7 +23,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { Notification } from '@/entities/Notification';
 import { I18nService } from 'nestjs-i18n';
 import { GoogleUserInfo } from '@/types/google';
-import { Language } from '@/utils/language';
+import type { Language } from '@/utils/language';
 
 @Injectable()
 export class AuthService {

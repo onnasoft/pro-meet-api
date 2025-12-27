@@ -25,7 +25,7 @@ import { generateRandomToken, Public } from '@/utils/secure';
 import { UsersService } from '../users/users.service';
 import { EmailService } from '@/services/email/email.service';
 import { I18nLang, I18nService } from 'nestjs-i18n';
-import { Language } from '@/utils/language';
+import type { Language } from '@/utils/language';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { Role } from '@/types/role';
 import {

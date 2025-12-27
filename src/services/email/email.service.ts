@@ -10,7 +10,7 @@ import welcome from './templates/welcome';
 import Handlebars from 'handlebars';
 import translations from './translations';
 import organizationUserInvite from './templates/organization-user-invite';
-import { Language } from '@/utils/language';
+import type { Language } from '@/utils/language';
 
 Handlebars.registerHelper('translate', function (key, options) {
   const language = options.data.root.language || 'en';

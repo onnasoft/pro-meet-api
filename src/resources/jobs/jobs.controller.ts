@@ -23,7 +23,7 @@ import {
   QueryParams,
 } from '@/utils/query';
 import { Job } from '@/entities/Job';
-import { Language } from '@/utils/language';
+import type { Language } from '@/utils/language';
 import { I18nLang, I18nService } from 'nestjs-i18n';
 import { OrganizationMembersService } from '../organization-members/organization-members.service';
 import { JobStatus } from '@/types/job';

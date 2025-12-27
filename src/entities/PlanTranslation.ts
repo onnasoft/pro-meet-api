@@ -10,7 +10,8 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 import { Plan } from './Plan';
-import { defaultLanguage, Language, languages } from '@/utils/language';
+import { defaultLanguage, languages } from '@/utils/language';
+import type { Language } from '@/utils/language';
 
 @Entity('plan_translations')
 @Unique(['plan', 'locale'])

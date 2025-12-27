@@ -19,7 +19,7 @@ import { Public } from '@/utils/secure';
 import { I18nLang } from 'nestjs-i18n';
 import { ResendVerificationAuthDto } from './dto/resend-verification-auth.dto';
 import { OAuthAuthDto } from './dto/oauth-auth.dto';
-import { Language } from '@/utils/language';
+import type { Language } from '@/utils/language';
 import { Role } from '@/types/role';
 import { jwtDecode } from 'jwt-decode';
 import { JWTPayload } from '@/types/jwt';
