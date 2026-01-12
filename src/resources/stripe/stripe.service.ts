@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { UsersService } from '../users/users.service';
 import { PlansService } from '../plans/plans.service';
+import { PlanStatus } from '@/types/plan-status';
 
 @Injectable()
 export class StripeService {
@@ -126,7 +127,7 @@ export class StripeService {
           planId: plan.id,
           planStartDate: currentPeriodStart,
           planEndDate: currentPeriodEnd,
-          planStatus: status,
+          planStatus: status as PlanStatus,
           stripeSubscriptionId: subscription.id,
         });
 

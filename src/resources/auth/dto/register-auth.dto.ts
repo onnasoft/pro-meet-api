@@ -1,7 +1,9 @@
+import { UserType } from '@/types/user-type';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEmail,
+  IsEnum,
   IsOptional,
   IsString,
   Length,
@@ -20,12 +22,21 @@ export class RegisterAuthDto {
   email: string;
 
   @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   @Length(0, 255)
   @Matches(/^[a-zA-Z0-9\s]*$/, {
     message: 'auth.company_invalid',
   })
   company?: string;
+
+  @ApiProperty({
+    description: 'User type: recruiter or candidate',
+    enum: UserType,
+    example: UserType.RECRUITER,
+  })
+  @IsEnum(UserType, { message: 'auth.invalid_user_type' })
+  userType: UserType;
 
   @ApiProperty()
   @IsString()

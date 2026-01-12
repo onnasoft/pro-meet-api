@@ -23,7 +23,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { Notification } from '@/entities/Notification';
 import { I18nService } from 'nestjs-i18n';
 import { GoogleUserInfo } from '@/types/google';
-import type { Language } from '@/utils/language';
+import { defaultLanguage, type Language } from '@/utils/language';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +36,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly i18n: I18nService,
-  ) { }
+  ) {}
 
   async session(user: User) {
     return this.usersService.findOne({
@@ -44,7 +44,7 @@ export class AuthService {
     });
   }
 
-  async register(registerDto: RegisterAuthDto, lang: Language = 'en') {
+  async register(registerDto: RegisterAuthDto, lang = defaultLanguage) {
     try {
       const existingUser = await this.usersService.findOne({
         where: { email: registerDto.email },

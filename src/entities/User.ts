@@ -16,6 +16,8 @@ import { Post } from './Post';
 import { PostLike } from './PostLike';
 import { PostComment } from './PostComment';
 import { PostShare } from './PostShare';
+import { UserType } from '@/types/user-type';
+import { PlanStatus } from '@/types/plan-status';
 
 @Entity('users')
 export class User {
@@ -63,6 +65,12 @@ export class User {
   })
   role: Role;
 
+  @Column({
+    type: 'enum',
+    enum: [UserType.CANDIDATE, UserType.RECRUITER],
+  })
+  userType: UserType;
+
   @Column({ type: 'varchar', length: 100, default: 'UTC' })
   timezone: string;
 
@@ -108,28 +116,20 @@ export class User {
   @Column({
     type: 'enum',
     enum: [
-      'active',
-      'canceled',
-      'past_due',
-      'unpaid',
-      'incomplete',
-      'incomplete_expired',
-      'trialing',
-      'paused',
+      PlanStatus.ACTIVE,
+      PlanStatus.CANCELED,
+      PlanStatus.PAST_DUE,
+      PlanStatus.UNPAID,
+      PlanStatus.INCOMPLETE,
+      PlanStatus.INCOMPLETE_EXPIRED,
+      PlanStatus.TRIALING,
+      PlanStatus.PAUSED,
     ],
-    default: 'active',
+    default: PlanStatus.ACTIVE,
     select: true,
     comment: "The status of the user's subscription plan",
   })
-  planStatus:
-    | 'active'
-    | 'canceled'
-    | 'past_due'
-    | 'unpaid'
-    | 'incomplete'
-    | 'incomplete_expired'
-    | 'trialing'
-    | 'paused';
+  planStatus: PlanStatus;
 
   @Column({ nullable: true, type: 'varchar', select: false })
   stripeSubscriptionId: string | null;
