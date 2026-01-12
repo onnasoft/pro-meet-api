@@ -1,26 +1,64 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProfileDto } from './dto/create-profile.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
+import { pagination } from '@/utils/pagination';
+import { Profile } from '@/entities/Profile';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Create, Update } from '@/types/models';
 
 @Injectable()
 export class ProfileService {
-  create(createProfileDto: CreateProfileDto) {
-    return 'This action adds a new profile';
+  constructor(
+    @InjectRepository(Profile)
+    private readonly profilesRepository: Repository<Profile>,
+  ) {}
+
+  create(payload: Create<Profile>) {
+    const profile = this.profilesRepository.create(payload);
+    return this.profilesRepository.save(profile);
   }
 
-  findAll() {
-    return `This action returns all profile`;
+  async findAndCount(options?: FindManyOptions<Profile>) {
+    const [profiles, count] =
+      await this.profilesRepository.findAndCount(options);
+
+    return pagination({
+      data: profiles,
+      count,
+      skip: options?.skip,
+      take: options?.take || 10,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
+  find(options?: FindManyOptions<Profile>) {
+    return this.profilesRepository.find(options);
   }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+  findOne(options: FindOneOptions<Profile>) {
+    return this.profilesRepository.findOne(options);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+  update(
+    options: FindOptionsWhere<Profile>,
+    payload: Update<Profile>,
+  ): Promise<UpdateResult>;
+  update(id: string, payload: Update<Profile>): Promise<Profile | null>;
+  update(options: any, payload: Update<Profile>) {
+    if (typeof options === 'string') {
+      return this.profilesRepository.update(options, payload).then(() => {
+        return this.findOne({ where: { id: options } });
+      });
+    }
+
+    return this.profilesRepository.update(options, payload);
+  }
+
+  remove(id: string) {
+    return this.profilesRepository.delete(id);
   }
 }

@@ -18,6 +18,7 @@ import { PostComment } from './PostComment';
 import { PostShare } from './PostShare';
 import { UserType } from '@/types/user-type';
 import { PlanStatus } from '@/types/plan-status';
+import { Profile } from './Profile';
 
 @Entity('users')
 export class User {
@@ -76,6 +77,11 @@ export class User {
 
   @Column({ nullable: true, type: 'varchar' })
   avatarUrl: string;
+
+  @OneToOne(() => Profile, (profile) => profile.user, {
+    cascade: true,
+  })
+  profile: Profile;
 
   @OneToMany(() => Organization, (organization) => organization.owner, {
     cascade: true,
