@@ -49,6 +49,7 @@ import { PostsModule } from './resources/posts/posts.module';
 import { PostLike } from './entities/PostLike';
 import { PostComment } from './entities/PostComment';
 import { PostShare } from './entities/PostShare';
+import { ProfileModule } from './resources/profile/profile.module';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -135,6 +136,7 @@ const isProd = process.env.NODE_ENV === 'production';
     S3Module,
     JobsModule,
     PostsModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService, CustomLangResolver],
