@@ -78,9 +78,7 @@ export class User {
   @Column({ nullable: true, type: 'varchar' })
   avatarUrl: string;
 
-  @OneToOne(() => Profile, (profile) => profile.user, {
-    cascade: true,
-  })
+  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
   profile: Profile;
 
   @OneToMany(() => Organization, (organization) => organization.owner, {

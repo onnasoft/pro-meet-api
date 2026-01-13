@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './User';
 import { ProfileStatus } from '@/types/profile';
@@ -16,7 +17,11 @@ export class Profile {
   id: string;
 
   @OneToOne(() => User, (user) => user.profile, { eager: true })
+  @JoinColumn()
   user: User;
+
+  @Column()
+  userId: string;
 
   @Column({
     type: 'enum',

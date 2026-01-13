@@ -50,6 +50,7 @@ import { PostLike } from './entities/PostLike';
 import { PostComment } from './entities/PostComment';
 import { PostShare } from './entities/PostShare';
 import { ProfileModule } from './resources/profile/profile.module';
+import { Profile } from './entities/Profile';
 
 const envPath = `.env.${process.env.NODE_ENV ?? 'development'}`;
 const envFileExists = fs.existsSync(envPath);
@@ -86,6 +87,7 @@ const isProd = process.env.NODE_ENV === 'production';
             PostLike,
             PostComment,
             PostShare,
+            Profile,
           ],
           synchronize: true,
         } as TypeOrmModuleOptions;

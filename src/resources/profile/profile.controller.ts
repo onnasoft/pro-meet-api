@@ -21,14 +21,22 @@ import {
   QueryParams,
 } from '@/utils/query';
 import { Profile } from '@/entities/Profile';
+import { ProfileStatus } from '@/types/profile';
 
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Post()
-  create(@Body() createProfileDto: CreateProfileDto) {
-    return this.profileService.create(createProfileDto);
+  create(
+    @Req() req: Express.Request & { user: User },
+    @Body() createProfileDto: CreateProfileDto,
+  ) {
+    return this.profileService.create({
+      ...createProfileDto,
+      userId: req.user.id,
+      status: ProfileStatus.INCOMPLETE || createProfileDto.status,
+    });
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])
@@ -43,6 +51,34 @@ export class ProfileController {
   }
 
   @SetMetadata('roles', [Role.User, Role.Admin])
+  @Get('me')
+  async findMe(
+    @Req() req: Express.Request & { user: User },
+    @Query() query: QueryParams<Profile>,
+  ) {
+    const session = req.user;
+    const options = buildFindOneOptions<Profile>(query);
+    return this.profileService
+      .findOne({
+        ...options,
+        where: { user: { id: session.id }, ...(options.where ?? {}) },
+      })
+      .then(async (profile) => {
+        if (!profile) {
+          const profile = await this.profileService.create({
+            status: ProfileStatus.INCOMPLETE,
+            userId: session.id,
+          });
+          return this.profileService.findOne({
+            ...options,
+            where: { id: profile.id },
+          });
+        }
+        return profile;
+      });
+  }
+
+  @SetMetadata('roles', [Role.User, Role.Admin])
   @Get(':id')
   async findOne(
     @Req() req: Express.Request & { user: User },
@@ -52,6 +88,7 @@ export class ProfileController {
     const options = buildFindOneOptions<Profile>(query);
     return this.profileService.findOne({
       ...options,
+      where: { id, ...(options.where ?? {}) },
     });
   }
 

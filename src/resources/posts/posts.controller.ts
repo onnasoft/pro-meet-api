@@ -59,6 +59,7 @@ export class PostsController {
     const options = buildFindOneOptions<PostEntity>(query);
     return this.postsService.findOne({
       ...options,
+      where: { id, ...(options.where ?? {}) },
     });
   }
 
